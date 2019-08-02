@@ -112,6 +112,26 @@ public class DatosFicheroXML {
 		}
 	}
 	
+	public String imprimeListaNombreObjetosRepetidosEnXML () {
+		boolean existeRepetido = false;
+		boolean primerRepetido = true;
+		String texto2print ="";
+		for (int aa=0; aa<numeroObjetosS3e;aa++) {					
+			if (listaNombreObjetosRepetidosEnXML.get(aa).size() > 0) {
+				if (primerRepetido) {
+					texto2print+="ERROR: Existen nombres repetidos en este fichero\n";
+					primerRepetido = false;
+				}
+				texto2print += listaNombreObjetosS3e.get(aa) + ": " + listaNombreObjetosRepetidosEnXML.get(aa) + "\t";				
+				existeRepetido = true;
+			}					
+		}
+		if (!existeRepetido) {
+			texto2print += "INFO: No existen nombres repetidos en este fichero\n";
+		}
+		return texto2print;
+	}
+	
 	public void calculaObjetosRepetidosS3e () {
 		List<String> listaDevueltaConDuplicados = new ArrayList<String>();
 		for (int i=0; i<listaNumeroObjetosS3e.size(); i++) 

@@ -1,27 +1,16 @@
-import java.io.BufferedWriter;
+
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.text.Document;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 
-//014
+//015
 
 public class main {
 	static DatosFicheroXML fichero1 = new DatosFicheroXML(); 
@@ -33,30 +22,32 @@ public class main {
 	
 	static File ficheroSalida = new File(ruta.getAbsolutePath() + "\\analisisXML.txt");
 	static int indiceFichero=0;
-	static String texto="";
-	
-	
-	//******* ARREGLAR ESTO
-	static boolean esS3e = false;
-	static int contadorStart =0;
+	static String texto="";	
 
-	public static void main(String argv[]) {		
+	public static void main(String argv[])   {		
 		if (ficheroSalida.exists()) {
 			ficheroSalida.delete();
 		}
 		
-		// se crea una lista de ficheros xml en la ruta indicada
+		// se crea una lista de ficheros xml en la ruta indicada (todos los ficheros, no se descarta ninguno)
 		List<File> listaFicherosXML = new ArrayList<File>();			
-		listaFicherosXML = Archivos.listarArchivosRecursivamente(ruta);
-						
-		// se recorre todos los archivos y crea un objeto tipo DatosFicheroXML por fichero valido		
+		listaFicherosXML = Archivos.listarArchivosRecursivamente(ruta);						
+				
+		// se recorre todos los archivos y crea un objeto tipo DatosFicheroXML por fichero valido	
+		int nFicheroValidado = 0;
 		for (int i = 0; i < listaFicherosXML.size(); i++) {
-			listaDatosFicheroXML.add(new DatosFicheroXML());
-			listaDatosFicheroXML.get(i).setFichero(listaFicherosXML.get(i));
-			
-			texto=i+ "\t\t\t "+listaDatosFicheroXML.get(i).getFichero();
-			System.out.println(texto);
-			escribeResultados.escribe(texto+"\n", ficheroSalida);			
+		    File ficheroXMLaValidar;
+		    ficheroXMLaValidar = listaFicherosXML.get(i);
+		    boolean esS3e = Archivos.ficheroXMLValido(ficheroXMLaValidar);
+		   		
+			if (esS3e) {
+				nFicheroValidado++;
+				listaDatosFicheroXML.add(new DatosFicheroXML());
+				listaDatosFicheroXML.get(nFicheroValidado-1).setFichero(listaFicherosXML.get(i));
+				texto=nFicheroValidado+ "\t\t\t "+listaDatosFicheroXML.get(nFicheroValidado-1).getFichero();
+				System.out.println(texto);
+				escribeResultados.escribe(texto+"\n", ficheroSalida);
+			}
 		}
 		
 		
@@ -76,35 +67,27 @@ public class main {
 			SAXParserFactory factory = SAXParserFactory.newInstance();
 			SAXParser saxParser = factory.newSAXParser();
 			
-			DefaultHandler handler = new DefaultHandler() {
-				
+			DefaultHandler handler = new DefaultHandler() {				
 				public void startElement(String uri, String localName,String qName, Attributes attributes) throws SAXException {
-					String etiqueta = qName;							
-										
-					//if (etiqueta.equalsIgnoreCase("S3e")) 
-						//esS3e = true;
-					if (true) {
+					String etiqueta = qName;			
+
 					// buscamos el startElement en nuestra lista de objetos a evaluar
-						for (int startE=0; startE<listaDatosFicheroXML.get(indiceFichero).getNumeroObjetosS3e();startE ++) {
-							// si la cabecera leida del xml esta en mi lista de obj s3e
-							if (qName.equalsIgnoreCase(listaDatosFicheroXML.get(indiceFichero).getListaNombreObjetosS3e().get(startE))) { 
-								listaDatosFicheroXML.get(indiceFichero).addNombreObjetoEnXML(attributes.getValue("Nombre"), startE);							
-							}
-						}	
+					for (int startE=0; startE<listaDatosFicheroXML.get(indiceFichero).getNumeroObjetosS3e();startE ++) {
+						// si la cabecera leida del xml esta en mi lista de obj s3e
+						if (qName.equalsIgnoreCase(listaDatosFicheroXML.get(indiceFichero).getListaNombreObjetosS3e().get(startE))) { 
+							listaDatosFicheroXML.get(indiceFichero).addNombreObjetoEnXML(attributes.getValue("Nombre"), startE);							
+						}
 					}
 				}
 			};
 			
-			System.out.println("\n");
-			System.out.println("------------ Empieza la fiesta --------------------------------------------");
-			for (indiceFichero=0;indiceFichero<listaFicherosXML.size();indiceFichero++){
-				//System.out.println(listaDatosFicheroXML.get(indiceFichero).getFichero());
-				
+			System.out.println("\n---");
+			
+			for (indiceFichero=0;indiceFichero<listaDatosFicheroXML.size();indiceFichero++){
 			    File ficheroXMLaExaminar;
-			    ficheroXMLaExaminar = listaDatosFicheroXML.get(indiceFichero).getFichero();
-			    
-			    esS3e = Archivos.ficheroXMLValido(ficheroXMLaExaminar);
-	    	    if (esS3e) {
+			    ficheroXMLaExaminar = listaDatosFicheroXML.get(indiceFichero).getFichero();			    
+			    //esS3e = Archivos.ficheroXMLValido(ficheroXMLaExaminar);
+	    	    if (true) {
 					texto=indiceFichero+ "\t\t\t "+listaDatosFicheroXML.get(indiceFichero).getFichero();
 					System.out.println(texto);
 					escribeResultados.escribe(texto+"\n", ficheroSalida);
@@ -112,63 +95,25 @@ public class main {
 	    	    	// llamamos a la funcion para que cuente los obejtos del S3e del fichero 0
 					listaDatosFicheroXML.get(indiceFichero).cuentaObjetosS3e();					
 					
-					// sacamos lista de numero de cada objeto del S3e
-					for (int aa=0; aa<listaDatosFicheroXML.get(indiceFichero).getNumeroObjetosS3e();aa++) {
-						//System.out.print(listaDatosFicheroXML.get(indiceFichero).getListaNombreObjetosS3e().get(aa) + ": " + listaDatosFicheroXML.get(indiceFichero).getListaNumeroObjetosS3e().get(aa) + "\t" )	;
+					// sacamos lista de numero de cada objeto del S3e. (60 MCS, 100 ED, etc)
+					for (int aa=0; aa<listaDatosFicheroXML.get(indiceFichero).getNumeroObjetosS3e();aa++) {						
 						texto=""+listaDatosFicheroXML.get(indiceFichero).getListaNombreObjetosS3e().get(aa) + ": " + listaDatosFicheroXML.get(indiceFichero).getListaNumeroObjetosS3e().get(aa) + "\t";
 						System.out.print(texto);
 						escribeResultados.escribe(texto, ficheroSalida);	
 					}
-								
-					//System.out.println("");
-					texto="";
-					System.out.println(texto);
-					escribeResultados.escribe(texto+"\n", ficheroSalida);	
+
+					System.out.println("");
+					escribeResultados.escribe("\n", ficheroSalida);	
 					
-					// llamamos a la funcion para que cuente los obejtos del S3e del fichero 0
+					// llamamos a la funcion para que cuente los obejtos del S3e del fichero 
 					listaDatosFicheroXML.get(indiceFichero).calculaObjetosRepetidosS3e();
-					
-					// imprimimos la lista de repetidos
-					listaDatosFicheroXML.get(indiceFichero).getListaNombreObjetosRepetidosEnXML();
 							
-					// sacamos solo los elementos repetidos por tipo
-					boolean existeRepetido = false;
-					boolean primerRepetido = true;
-					for (int aa=0; aa<listaDatosFicheroXML.get(indiceFichero).getNumeroObjetosS3e();aa++) {					
-						if (listaDatosFicheroXML.get(indiceFichero).getListaNombreObjetosRepetidosEnXML().get(aa).size() > 0) {
-							if (primerRepetido) {
-								//System.out.println("ERROR: Existen nombres repetidos en este fichero");
-								texto="ERROR: Existen nombres repetidos en este fichero";
-								System.out.println(texto);
-								escribeResultados.escribe(texto+"\n", ficheroSalida);	
-								primerRepetido = false;
-							}
-							//System.out.print(listaDatosFicheroXML.get(indiceFichero).getListaNombreObjetosS3e().get(aa) + ": " + 
-								//	listaDatosFicheroXML.get(indiceFichero).getListaNombreObjetosRepetidosEnXML().get(aa) + "\t" );
-							texto=listaDatosFicheroXML.get(indiceFichero).getListaNombreObjetosS3e().get(aa) + ": " + 
-									listaDatosFicheroXML.get(indiceFichero).getListaNombreObjetosRepetidosEnXML().get(aa) + "\t";
-							System.out.print(texto);
-							escribeResultados.escribe(texto+"\n", ficheroSalida);
-							existeRepetido = true;
-						}					
-					}
-					if (!existeRepetido) {
-						//System.out.println("INFO: No existen nombres repetidos en este fichero"); 
-						texto="INFO: No existen nombres repetidos en este fichero";
-						System.out.println(texto);
-						escribeResultados.escribe(texto+"\n", ficheroSalida);	
-					}
-					
-					//System.out.println("");
-					texto="";
+					// sacamos solo los elementos repetidos por tipo					
+					texto="************* " + listaDatosFicheroXML.get(indiceFichero).imprimeListaNombreObjetosRepetidosEnXML();
 					System.out.println(texto);
-					escribeResultados.escribe(texto+"\n", ficheroSalida);	    	    	
+					escribeResultados.escribe(texto+"\n", ficheroSalida);
+					
 	    	    }
-				
-								
-				
-				
-				esS3e = false;
 			}
 									
 		} catch (Exception e) {

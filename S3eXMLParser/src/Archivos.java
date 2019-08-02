@@ -30,8 +30,11 @@ public class Archivos {
 		return  (ArrayList<File>) listaFicherosXML;
 	}	 
 	
-	public static boolean ficheroXMLValido(File file) throws FileNotFoundException {
-		
+	
+	
+	
+	
+	public static boolean ficheroXMLValido(File file)  {		
 		FileReader fr;
 		try {
 			fr = new FileReader (file);
