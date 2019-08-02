@@ -21,12 +21,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 
-//001 primer cambio
-//002 segundo cambio
-//003 tercer cambio desde lenovo trabajo
-//004 cuarto cmabio desde web github
-//005 desde github
-//006 desde git
+//007 desde git
 
 public class main {
 	static DatosFicheroXML fichero1 = new DatosFicheroXML(); 
