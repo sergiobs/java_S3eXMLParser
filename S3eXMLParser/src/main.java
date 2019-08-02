@@ -21,7 +21,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 
-//011 lenovo 
+//012
 
 public class main {
 	static DatosFicheroXML fichero1 = new DatosFicheroXML(); 
