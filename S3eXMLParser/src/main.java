@@ -21,6 +21,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 
+//001 primer cambio
+
 public class main {
 	static DatosFicheroXML fichero1 = new DatosFicheroXML(); 
 	static List<DatosFicheroXML> listaDatosFicheroXML = new ArrayList<DatosFicheroXML>(); //una lista de objetos. un objeto por cada fichero xml

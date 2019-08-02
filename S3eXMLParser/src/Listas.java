@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
 
-
+// f
 public class Listas {
     static void mostrarRepetidos(ArrayList<String> Lista){
     	for (int i=0; i<Lista.size(); i++ ) {
