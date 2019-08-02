@@ -24,6 +24,7 @@ import org.xml.sax.helpers.DefaultHandler;
 //001 primer cambio
 //002 segundo cambio
 //003 tercer cambio desde lenovo trabajo
+//004 cuarto cmabio desde web github
 
 public class main {
 	static DatosFicheroXML fichero1 = new DatosFicheroXML(); 
@@ -31,7 +32,7 @@ public class main {
 	
 	// indicamos la ruta donde vamos a buscar los xml
 	static File ruta = new File("C:\\temp\\");
-	//static File ruta = new File("C:\\CAFs_SBS\\ENCE\\ramas\\ENCE_DESARROLLO\\SIST\\Validación\\Entorno\\ContextosPrueba\\");
+	//static File ruta = new File("C:\\CAFs_SBS\\ENCE\\ramas\\ENCE_DESARROLLO\\SIST\\ValidaciÃ³n\\Entorno\\ContextosPrueba\\");
 	
 	static File ficheroSalida = new File(ruta.getAbsolutePath() + "\\analisisXML.txt");
 	static int indiceFichero=0;
