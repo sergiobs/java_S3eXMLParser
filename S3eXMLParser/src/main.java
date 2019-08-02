@@ -26,6 +26,7 @@ import org.xml.sax.helpers.DefaultHandler;
 //003 tercer cambio desde lenovo trabajo
 //004 cuarto cmabio desde web github
 //005 desde github
+//006 desde git
 
 public class main {
 	static DatosFicheroXML fichero1 = new DatosFicheroXML(); 
