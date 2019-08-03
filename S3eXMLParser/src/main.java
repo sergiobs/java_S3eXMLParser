@@ -10,15 +10,19 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 
-//015
+//016: versi�n que calcula identificadores no usados
 
 public class main {
 	static DatosFicheroXML fichero1 = new DatosFicheroXML(); 
 	static List<DatosFicheroXML> listaDatosFicheroXML = new ArrayList<DatosFicheroXML>(); //una lista de objetos. un objeto por cada fichero xml
 	
 	// indicamos la ruta donde vamos a buscar los xml
-	static File ruta = new File("C:\\temp\\");
-	//static File ruta = new File("C:\\CAFs_SBS\\ENCE\\ramas\\ENCE_DESARROLLO\\SIST\\Validación\\Entorno\\ContextosPrueba\\");
+	
+	static String rutaBase = "C:\\temp3";
+	//static String rutaBase = "C:\\CAFs_SBS\\ENCE\\ramas\\ENCE_DESARROLLO\\SIST\\Validación\\Entorno\\ContextosPrueba\\";
+	static File ruta = new File(rutaBase);
+	
+	
 	
 	static File ficheroSalida = new File(ruta.getAbsolutePath() + "\\analisisXML.txt");
 	static int indiceFichero=0;
@@ -44,9 +48,9 @@ public class main {
 				nFicheroValidado++;
 				listaDatosFicheroXML.add(new DatosFicheroXML());
 				listaDatosFicheroXML.get(nFicheroValidado-1).setFichero(listaFicherosXML.get(i));
-				texto=nFicheroValidado+ "\t\t\t "+listaDatosFicheroXML.get(nFicheroValidado-1).getFichero();
-				System.out.println(texto);
-				escribeResultados.escribe(texto+"\n", ficheroSalida);
+				//texto=nFicheroValidado+ "\t\t\t "+listaDatosFicheroXML.get(nFicheroValidado-1).getFichero();
+				//System.out.println(texto);
+				//escribeResultados.escribe(texto+"\n", ficheroSalida);
 			}
 		}
 		
@@ -72,23 +76,25 @@ public class main {
 					String etiqueta = qName;			
 
 					// buscamos el startElement en nuestra lista de objetos a evaluar
-					for (int startE=0; startE<listaDatosFicheroXML.get(indiceFichero).getNumeroObjetosS3e();startE ++) {
+					for (int startE=0; startE<listaDatosFicheroXML.get(indiceFichero).getNumeroObjetosS3e(); startE ++) {
 						// si la cabecera leida del xml esta en mi lista de obj s3e
 						if (qName.equalsIgnoreCase(listaDatosFicheroXML.get(indiceFichero).getListaNombreObjetosS3e().get(startE))) { 
-							listaDatosFicheroXML.get(indiceFichero).addNombreObjetoEnXML(attributes.getValue("Nombre"), startE);							
+							listaDatosFicheroXML.get(indiceFichero).addNombreObjetoEnXML(attributes.getValue("Nombre"), startE);
+							listaDatosFicheroXML.get(indiceFichero).addIdentificadorObjetoEnXML(attributes.getValue("Identificador"), startE);
 						}
 					}
 				}
 			};
 			
-			System.out.println("\n---");
+			//System.out.println("\n---");
 			
+			// bucle para procesar cada objeto contenido en el array de listaDatosFicheroXML			
 			for (indiceFichero=0;indiceFichero<listaDatosFicheroXML.size();indiceFichero++){
 			    File ficheroXMLaExaminar;
 			    ficheroXMLaExaminar = listaDatosFicheroXML.get(indiceFichero).getFichero();			    
 			    //esS3e = Archivos.ficheroXMLValido(ficheroXMLaExaminar);
 	    	    if (true) {
-					texto=indiceFichero+ "\t\t\t "+listaDatosFicheroXML.get(indiceFichero).getFichero();
+					texto=indiceFichero+ " "+listaDatosFicheroXML.get(indiceFichero).getFichero()+"";
 					System.out.println(texto);
 					escribeResultados.escribe(texto+"\n", ficheroSalida);
 	    	    	saxParser.parse(ficheroXMLaExaminar, handler);
@@ -96,24 +102,46 @@ public class main {
 					listaDatosFicheroXML.get(indiceFichero).cuentaObjetosS3e();					
 					
 					// sacamos lista de numero de cada objeto del S3e. (60 MCS, 100 ED, etc)
-					for (int aa=0; aa<listaDatosFicheroXML.get(indiceFichero).getNumeroObjetosS3e();aa++) {						
-						texto=""+listaDatosFicheroXML.get(indiceFichero).getListaNombreObjetosS3e().get(aa) + ": " + listaDatosFicheroXML.get(indiceFichero).getListaNumeroObjetosS3e().get(aa) + "\t";
-						System.out.print(texto);
-						escribeResultados.escribe(texto, ficheroSalida);	
-					}
+					texto="" + listaDatosFicheroXML.get(indiceFichero).imprimelistaNumeroObjetosS3e();
+					System.out.println(texto);
+					escribeResultados.escribe(texto+"\n", ficheroSalida);	
 
 					System.out.println("");
 					escribeResultados.escribe("\n", ficheroSalida);	
 					
-					// llamamos a la funcion para que cuente los obejtos del S3e del fichero 
-					listaDatosFicheroXML.get(indiceFichero).calculaObjetosRepetidosS3e();
+					// llamamos a la funcion para que cuente los objetos del S3e del fichero 
+					listaDatosFicheroXML.get(indiceFichero).calculaNombreObjetosRepetidosS3e();
 							
-					// sacamos solo los elementos repetidos por tipo					
-					texto="************* " + listaDatosFicheroXML.get(indiceFichero).imprimeListaNombreObjetosRepetidosEnXML();
+					// imprimimos solo los elementos repetidos por tipo					
+					texto="" + listaDatosFicheroXML.get(indiceFichero).imprimeListaNombreObjetosRepetidosEnXML();
+					System.out.println(texto);
+					escribeResultados.escribe(texto+"\n", ficheroSalida);	
+					
+					texto="Elementos no usados:";
+					System.out.println(texto);
+					escribeResultados.escribe(texto+"\n", ficheroSalida);
+					
+					
+//					listaDatosFicheroXML.get(indiceFichero).calculaObjetosNoUsados("MCS");
+//					listaDatosFicheroXML.get(indiceFichero).calculaObjetosNoUsados("CV");
+//					listaDatosFicheroXML.get(indiceFichero).calculaObjetosNoUsados("AG");
+//					listaDatosFicheroXML.get(indiceFichero).calculaObjetosNoUsados("MA");
+//					listaDatosFicheroXML.get(indiceFichero).calculaObjetosNoUsados("MF");
+//					listaDatosFicheroXML.get(indiceFichero).calculaObjetosNoUsados("ED");
+//					listaDatosFicheroXML.get(indiceFichero).calculaObjetosNoUsados("SD");
+					
+					
+					listaDatosFicheroXML.get(indiceFichero).calculaIdentificadorObjetosNoUsadosS3e();					
+					texto=listaDatosFicheroXML.get(indiceFichero).imprimeIdentificadorObjetosNoUsadosS3e();
+					System.out.println(texto);
+					escribeResultados.escribe(texto+"\n", ficheroSalida);
+					
+					texto="--------------------------------------------------------\n";
 					System.out.println(texto);
 					escribeResultados.escribe(texto+"\n", ficheroSalida);
 					
 	    	    }
+	    	    
 			}
 									
 		} catch (Exception e) {

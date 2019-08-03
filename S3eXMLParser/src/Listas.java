@@ -19,7 +19,7 @@ public class Listas {
     	for (int i=0; i<Lista.size(); i++ ) { 
         	for (int j=i+1; j <Lista.size(); j++ ) { 
 	    	   if(Lista.get(i).equals(Lista.get(j))) {	    		   
-	    		   listaDuplicados.add(Lista.get(i));
+	    		   if (!listaDuplicados.contains(Lista.get(i)) ) listaDuplicados.add(Lista.get(i));
 	    	   	}
         	}
         } 
