@@ -7,6 +7,16 @@ import java.util.List;
 import java.util.Scanner;
 
 
+
+
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
+
+
+
 public class DatosFicheroXML {
 	
 	// getters
@@ -53,7 +63,7 @@ public class DatosFicheroXML {
 	}
 	
 	// constructor
-	public DatosFicheroXML () {
+	public DatosFicheroXML (File ficheroXML) {
 		
 		listaNombreObjetosS3e.add("MCS");
 		listaNombreObjetosS3e.add("CSE");
@@ -96,8 +106,9 @@ public class DatosFicheroXML {
 		listaNombreObjetosS3e.add("MF_local");
 		
 		this.numeroObjetosS3e = listaNombreObjetosS3e.size();
+		this.fichero = ficheroXML;
 		
-		// se crea una lista de numObjS3e elementos que contendra el numero de obejtos de cada tipo (numeroMCS, numeroED, numeroSD, )
+		// se crea una lista de numObjS3e elementos que contendra el numero de objetos de cada tipo (numeroMCS, numeroED, numeroSD, )
 		// inicialmente todos con valor 0
 		for (int i=0; i<numeroObjetosS3e; i++) 
 			this.listaNumeroObjetosS3e.add(0);
@@ -110,14 +121,45 @@ public class DatosFicheroXML {
 		// ...
 		// listaNombreObjetosRepetidosEnXML(numObjS3e-1) = etc
 		
-
-		for (int i=0; i<numeroObjetosS3e; i++) 
-		{
+		for (int i=0; i<numeroObjetosS3e; i++) {
 			this.listaNombreObjetosRepetidosEnXML.add(new ArrayList<String>());
 			this.listaNombreObjetosEnXML.add(new ArrayList<String>());
 			this.listaIdentificadorObjetosEnXML.add(new ArrayList<String>());
 			this.listaIdentificadorUsadosObjetosEnXML.add(new ArrayList<Boolean>());
 			this.listaIdentificadorObjetos_noUsadosEnXML.add(new ArrayList<String>());			
+		}		
+		parseaXMLS3e();
+		
+	}
+	
+	public void parseaXMLS3e () {
+		try {
+			SAXParserFactory factory2 = SAXParserFactory.newInstance();
+			SAXParser saxParser2 = factory2.newSAXParser();
+			
+			DefaultHandler handler = new DefaultHandler() {				
+				//public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+				public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+					String etiqueta = qName;			
+
+					// buscamos el startElement en nuestra lista de objetos a evaluar
+					for (int startE=0; startE<numeroObjetosS3e; startE ++) {
+						// si la cabecera leida del xml esta en mi lista de obj s3e
+						if (etiqueta.equalsIgnoreCase(listaNombreObjetosS3e.get(startE))) { 
+							//datosFicheroXML.addNombreObjetoEnXML(attributes.getValue("Nombre"), startE);
+							//this.listaNombreObjetosEnXML.get(indice).add(nombreObjetoEnXML);							
+							//datosFicheroXML.addIdentificadorObjetoEnXML(attributes.getValue("Identificador"), startE);
+							listaNombreObjetosEnXML.get(startE).add(attributes.getValue("Nombre"));
+							listaIdentificadorObjetosEnXML.get(startE).add(attributes.getValue("Identificador"));							
+						}
+					}
+				}				
+			};				
+			saxParser2.parse(fichero, handler);
+			
+		} catch (Exception e) {
+			System.out.println("main: " + e);
+			e.printStackTrace();
 		}
 	}
 	
@@ -246,15 +288,12 @@ public class DatosFicheroXML {
 		} catch (IOException e) {			
 			e.printStackTrace();
 		}
-		
-		//System.out.print(tipoObjetoS3e+": ");		
+
 		for (int inObjeto = 0; inObjeto<this.listaIdentificadorUsadosObjetosEnXML.get(inTipoObjetoS3e).size(); inObjeto++) {
 			if (!this.listaIdentificadorUsadosObjetosEnXML.get(inTipoObjetoS3e).get(inObjeto)) {
 				listaIdentificadorObjetos_noUsadosEnXML.get(inTipoObjetoS3e).add(this.listaIdentificadorObjetosEnXML.get(inTipoObjetoS3e).get(inObjeto));				
 			}
 		}
-		//if (listaIdentificadorObjetos_noUsadosEnXML.get(inTipoObjetoS3e).size()>0)
-		//	System.out.println(listaIdentificadorObjetos_noUsadosEnXML.get(inTipoObjetoS3e));
 	}
 	
 	private int devuelveIndiceObjetoS3e(String nombreObjetoS3e) {
