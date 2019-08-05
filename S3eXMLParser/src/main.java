@@ -9,6 +9,9 @@ import java.sql.Timestamp;
 //017: * Ya no se usa lista de objetos (un objeto por fichero).
 //     * listaDatosFicheroXML pasa a ser datosFicheroXML
 //     * el parseador de XML se mete en la clase DatosFichero
+//018: * Se leen sicamPC y se obtiene lista de ficheros script
+//		
+//
 
 public class main {
 	// indicamos la ruta donde vamos a buscar los xml	
@@ -27,7 +30,7 @@ public class main {
 		
 		List<File> listaFicherosXML = new ArrayList<File>();
 		List<File> listaFicherosXML_validos = new ArrayList<File>();
-		listaFicherosXML = Archivos.listarArchivosRecursivamente(ruta);			
+		listaFicherosXML = Archivos.listarArchivosXMLRecursivamente(ruta);			
 				
 		// se recorre todos los archivos y crea un objeto tipo DatosFicheroXML por fichero valido	
 		int nFicheroValidado = 0;
@@ -46,19 +49,20 @@ public class main {
 				escribeResultados.escribe(texto+"\n", ficheroSalida);
 			}
 		}
+		
 
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 		timestamp = new Timestamp(System.currentTimeMillis());
-		texto = timestamp+"";
+		texto = timestamp+" - " + "Comienza el analisis de ficheros: .....\n";
 		System.out.println(timestamp);
 		escribeResultados.escribe(texto+"\n", ficheroSalida);
 				
 		// bucle para procesar cada objeto contenido en el array de listaDatosFicheroXML			
 		for (indiceFichero=0;indiceFichero<listaFicherosXML_validos.size();indiceFichero++){
 			Timestamp timestamp1 = new Timestamp(System.currentTimeMillis());
-			DatosFicheroXML datosFicheroXML = new DatosFicheroXML(listaFicherosXML.get(indiceFichero)); 
+			DatosFicheroXML datosFicheroXML = new DatosFicheroXML(listaFicherosXML_validos.get(indiceFichero)); 
    	    
-			texto=indiceFichero+ " "+datosFicheroXML.getFichero()+"";
+			texto=timestamp+" - " + indiceFichero+ " "+datosFicheroXML.getFichero()+"\n-------------------------------------------\n";
 			System.out.println(texto);
 			escribeResultados.escribe(texto+"\n", ficheroSalida);
 				    	    	
@@ -66,7 +70,7 @@ public class main {
 			datosFicheroXML.cuentaObjetosS3e();					
 			
 			// sacamos lista de numero de cada objeto del S3e. (60 MCS, 100 ED, etc)
-			texto="" + datosFicheroXML.imprimelistaNumeroObjetosS3e();
+			texto="*** Numero de objetos:\n" + datosFicheroXML.imprimelistaNumeroObjetosS3e();
 			System.out.println(texto);
 			escribeResultados.escribe(texto+"\n", ficheroSalida);	
 
@@ -76,12 +80,16 @@ public class main {
 			// llamamos a la funcion para que cuente los objetos del S3e del fichero 
 			datosFicheroXML.calculaNombreObjetosRepetidosS3e();
 					
-			// imprimimos solo los elementos repetidos por tipo					
+			// imprimimos solo los elementos repetidos por tipo
+			texto="*** Objetos repetidos:";
+			System.out.println(texto);
+			escribeResultados.escribe(texto+"\n", ficheroSalida);	
+			
 			texto="" + datosFicheroXML.imprimeListaNombreObjetosRepetidosEnXML();
 			System.out.println(texto);
 			escribeResultados.escribe(texto+"\n", ficheroSalida);	
 			
-			texto="Elementos no usados:";
+			texto="*** Elementos no usados:";
 			System.out.println(texto);
 			escribeResultados.escribe(texto+"\n", ficheroSalida);
 			
@@ -93,14 +101,43 @@ public class main {
 			Timestamp timestamp2 = new Timestamp(System.currentTimeMillis());
 			long milisenconds = timestamp2.getTime()-timestamp1.getTime();
 			
-			texto = "duracion: " + milisenconds+" mseg";
-			System.out.println(texto);
-			escribeResultados.escribe(texto+"\n", ficheroSalida);
+			// se busca en los scripts
+			int nFicheroScriptValidado = 0;
+			for (int i = 0; i < listaFicherosXML.size(); i++) {
+				List<File> listaFicherosScriptTotales = new ArrayList<File>();
+				
+				File auxF = datosFicheroXML.getFileScriptsAutomaticos() ;
+				
+				listaFicherosScriptTotales = Archivos.listarArchivosScript(datosFicheroXML.getFileScriptsAutomaticos());		
+				
+			    File ficheroScript = listaFicherosScriptTotales.get(i);
+			    
+			    
+//			    boolean esS3e = Archivos.ficheroXMLValido(ficheroXMLaValidar);
+//			   		
+//				if (esS3e) {
+//					nFicheroScriptValidado++;
+//					listaFicherosXML_validos.add(ficheroXMLaValidar);
+//					//datosFicheroXML.add(new DatosFicheroXML());
+//					//datosFicheroXML.get(nFicheroValidado-1).setFichero(listaFicherosXML.get(i));
+//					texto=nFicheroScriptValidado+ "\t "+listaFicherosXML_validos.get(nFicheroScriptValidado-1);
+//					System.out.println(texto);
+//					escribeResultados.escribe(texto+"\n", ficheroSalida);
+//				}
+			}
 			
-			texto="--------------------------------------------------------\n";
+			
+			
+			
+			
+			texto = "duracion: " + milisenconds+" mseg\n\n\n";
 			System.out.println(texto);
 			escribeResultados.escribe(texto+"\n", ficheroSalida);
+
 		}
+		texto = "****************************************************\nFin del analisis\n\n\n";
+		System.out.println(texto);
+		escribeResultados.escribe(texto+"\n", ficheroSalida);
 
 	}
 	

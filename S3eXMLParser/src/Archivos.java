@@ -11,17 +11,14 @@ import java.util.List;
 public class Archivos {
 	
 	static List<File> listaFicherosXML = new ArrayList<File>();
+	static List<File> listaFicherosScript = new ArrayList<File>();
 
-	public static ArrayList<File> listarArchivosRecursivamente(File file) {		   
-		//List<String> listaFicherosXMLString = new ArrayList<String>();
-		//List<File> listaFicherosXML = new ArrayList<File>();		   	
-
+	public static ArrayList<File> listarArchivosXMLRecursivamente(File file) {	   	
 		File[] ficheros = file.listFiles();
 
 		for (int i = 0; i < ficheros.length; i++) {
 			if (ficheros[i].isDirectory()) {
-				//listarArchivosRecursivamente(ficheros[i], ficheros[i].getAbsolutePath());
-				listarArchivosRecursivamente(ficheros[i]);
+				listarArchivosXMLRecursivamente(ficheros[i]);
 			} else if (getExtension(ficheros[i].getName()).equals("xml") && !ficheros[i].getName().equals("sicampc.xml") )
 			{
 				listaFicherosXML.add(ficheros[i]);				
@@ -30,9 +27,20 @@ public class Archivos {
 		return  (ArrayList<File>) listaFicherosXML;
 	}	 
 	
-	
-	
-	
+	public static ArrayList<File> listarArchivosScript(File file) {	   	
+		//List<File> listaFicherosScript = new ArrayList<File>();
+		File[] ficheros = file.listFiles();
+
+		for (int i = 0; i < ficheros.length; i++) {
+			if (ficheros[i].isDirectory()) {
+				listarArchivosScript(ficheros[i]);
+			} else if (getExtension(ficheros[i].getName()).equals("script"))
+			{
+				listaFicherosScript.add(ficheros[i]);				
+			}
+		}		
+		return  (ArrayList<File>) listaFicherosScript;
+	}		
 	
 	public static boolean ficheroXMLValido(File file)  {		
 		FileReader fr;

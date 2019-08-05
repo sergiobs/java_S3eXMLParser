@@ -23,8 +23,14 @@ public class DatosFicheroXML {
 	public String getNombreFichero() {
 		return nombreFichero;
 	}
+	public String getPathScriptsAutomaticos() {
+		return pathScriptsAutomaticos;
+	}
 	public File getFichero() {
 		return fichero;
+	}
+	public File getFileScriptsAutomaticos() {
+		return fileScriptsAutomaticos;
 	}
 	public List<Integer> getListaNumeroObjetosS3e() {
 		return listaNumeroObjetosS3e;
@@ -107,7 +113,15 @@ public class DatosFicheroXML {
 		
 		this.numeroObjetosS3e = listaNombreObjetosS3e.size();
 		this.fichero = ficheroXML;
+		this.pathScriptsAutomaticos="";
+		this.pathSicamPCXML="";
+				
+		nombreFichero= fichero.getName();
 		
+		//localizamos el sicampc.xml		
+		pathSicamPCXML = fichero.getPath().substring(0, fichero.getPath().length() - nombreFichero.length())+"\\..\\..\\";
+		ficheroSicamPC = new File(pathSicamPCXML+"sicampc.xml");
+				
 		// se crea una lista de numObjS3e elementos que contendra el numero de objetos de cada tipo (numeroMCS, numeroED, numeroSD, )
 		// inicialmente todos con valor 0
 		for (int i=0; i<numeroObjetosS3e; i++) 
@@ -129,6 +143,16 @@ public class DatosFicheroXML {
 			this.listaIdentificadorObjetos_noUsadosEnXML.add(new ArrayList<String>());			
 		}		
 		parseaXMLS3e();
+		if (fichero.exists()) {
+			parseaSicamPcXML();
+			fileScriptsAutomaticos = new File(pathScriptsAutomaticos);
+			
+			
+		}else {
+			System.out.println("No existe sicampc.xml");
+		}
+		
+		
 		
 	}
 	
@@ -137,25 +161,55 @@ public class DatosFicheroXML {
 			SAXParserFactory factory2 = SAXParserFactory.newInstance();
 			SAXParser saxParser2 = factory2.newSAXParser();
 			
-			DefaultHandler handler = new DefaultHandler() {				
-				//public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+			DefaultHandler handler = new DefaultHandler() {
 				public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-					String etiqueta = qName;			
-
+					String etiqueta = qName;
 					// buscamos el startElement en nuestra lista de objetos a evaluar
 					for (int startE=0; startE<numeroObjetosS3e; startE ++) {
 						// si la cabecera leida del xml esta en mi lista de obj s3e
-						if (etiqueta.equalsIgnoreCase(listaNombreObjetosS3e.get(startE))) { 
-							//datosFicheroXML.addNombreObjetoEnXML(attributes.getValue("Nombre"), startE);
-							//this.listaNombreObjetosEnXML.get(indice).add(nombreObjetoEnXML);							
-							//datosFicheroXML.addIdentificadorObjetoEnXML(attributes.getValue("Identificador"), startE);
+						if (etiqueta.equalsIgnoreCase(listaNombreObjetosS3e.get(startE))) {
 							listaNombreObjetosEnXML.get(startE).add(attributes.getValue("Nombre"));
 							listaIdentificadorObjetosEnXML.get(startE).add(attributes.getValue("Identificador"));							
 						}
 					}
 				}				
-			};				
+			};			
+			
 			saxParser2.parse(fichero, handler);
+			
+		} catch (Exception e) {
+			System.out.println("main: " + e);
+			e.printStackTrace();
+		}
+	}
+	
+	public void parseaSicamPcXML() {
+		try {
+			SAXParserFactory factory2 = SAXParserFactory.newInstance();
+			SAXParser saxParser2 = factory2.newSAXParser();
+			
+			DefaultHandler handler = new DefaultHandler() {
+				public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+					String etiqueta = qName;
+					String atributo = attributes.getValue("Tipo");
+					String valor = attributes.getValue("PathScriptsAutomaticos");
+
+					// buscamos el startElement en nuestra lista de objetos a evaluar
+					if (etiqueta.equalsIgnoreCase("Proceso")&&(atributo.equals("IHM"))) {							
+						pathScriptsAutomaticos = valor;
+						//System.out.println("pathScriptsAutomaticos1: " + pathScriptsAutomaticos);
+						pathScriptsAutomaticos = pathScriptsAutomaticos.replace("/", "\\");
+						//System.out.println("pathScriptsAutomaticos2: " + pathScriptsAutomaticos);
+						//pathScriptsAutomaticos = fichero.getPath()+pathScriptsAutomaticos;
+						//pathScriptsAutomaticos = fichero.getPath().substring(0, fichero.getPath().length() - nombreFichero.length())+"\\..\\..\\";
+						pathScriptsAutomaticos = pathSicamPCXML + pathScriptsAutomaticos;						
+						//System.out.println("pathScriptsAutomaticos3: " + pathScriptsAutomaticos);
+
+					}
+				}				
+			};			
+
+			saxParser2.parse(ficheroSicamPC, handler);
 			
 		} catch (Exception e) {
 			System.out.println("main: " + e);
@@ -177,7 +231,7 @@ public class DatosFicheroXML {
 		for (int aa=0; aa<numeroObjetosS3e;aa++) {					
 			if (listaNombreObjetosRepetidosEnXML.get(aa).size() > 0) {
 				if (primerRepetido) {
-					texto2print+="ERROR: Existen nombres repetidos en este fichero\n";
+					texto2print+="ERROR: Existen nombres repetidos en este fichero: \n";
 					primerRepetido = false;
 				}
 				texto2print += listaNombreObjetosS3e.get(aa) + ": " ;
@@ -188,7 +242,7 @@ public class DatosFicheroXML {
 			}					
 		}
 		if (!existeRepetido) {
-			texto2print += "INFO: No existen nombres repetidos en este fichero\n";
+			texto2print += "INFO: NO existen nombres repetidos en este fichero\n";
 		}
 		return texto2print;
 	}
@@ -307,6 +361,8 @@ public class DatosFicheroXML {
 	
 	// variables del objeto
 	private String nombreFichero;
+	private String pathScriptsAutomaticos;
+	private String pathSicamPCXML;
 	private List<String> listaNombreObjetosS3e = new ArrayList<String>();
 	private List<Integer> listaNumeroObjetosS3e = new ArrayList<Integer>();
 	private List<List<String>> listaNombreObjetosRepetidosEnXML = new ArrayList<List<String>>();
@@ -315,6 +371,8 @@ public class DatosFicheroXML {
 	private List<List<String>> listaIdentificadorObjetos_noUsadosEnXML = new ArrayList<List<String>>();
 	private List<List<Boolean>> listaIdentificadorUsadosObjetosEnXML = new ArrayList<List<Boolean>>();
 	private File fichero = new File("");
+	private File ficheroSicamPC = new File("");
+	private File fileScriptsAutomaticos;
 	private int numeroObjetosS3e;		
 
 }
