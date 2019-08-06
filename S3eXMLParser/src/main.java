@@ -5,13 +5,13 @@ import java.util.List;
 import java.sql.Timestamp;
 
 
-//016: versión que calcula identificadores no usados
-//017: * Ya no se usa lista de objetos (un objeto por fichero).
-//     * listaDatosFicheroXML pasa a ser datosFicheroXML
-//     * el parseador de XML se mete en la clase DatosFichero
-//018: * Se leen sicamPC y se obtiene lista de ficheros script
-//019: * Se hace busqueda de elementos repetidos en script		
-//
+//016 		* versión que calcula identificadores no usados
+//017 		* Ya no se usa lista de objetos (un objeto por fichero).
+//  		* listaDatosFicheroXML pasa a ser datosFicheroXML
+//     		* el parseador de XML se mete en la clase DatosFichero
+//018 		* Se leen sicamPC y se obtiene lista de ficheros script
+//019 		* Se hace busqueda de elementos repetidos en script		
+//				019.01 	* fichero de salida contiene timestamp en su nombre
 
 public class main {
 	// indicamos la ruta donde vamos a buscar los xml	
@@ -19,18 +19,28 @@ public class main {
 	//static String rutaBase = "C:\\CAFs_SBS\\ENCE\\ramas\\ENCE_DESARROLLO\\SIST\\ValidaciÃ³n\\Entorno\\ContextosPrueba\\";
 	static File ruta = new File(rutaBase);
 	
-	static File ficheroSalida = new File(ruta.getAbsolutePath() + "\\analisisXML.txt");
+	
 	static int indiceFichero=0;
 	static String texto="";	
 
 	public static void main(String argv[])   {		
+		List<File> listaFicherosXML = new ArrayList<File>();
+		List<File> listaFicherosXML_validos = new ArrayList<File>();
+		listaFicherosXML = Archivos.listarArchivosXMLRecursivamente(ruta);		
+		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+		String ficheroSalidaNombre="";
+		ficheroSalidaNombre =timestamp+"";
+		ficheroSalidaNombre=ficheroSalidaNombre.replace(":", "-");
+		//ficheroSalidaNombre="";
+		System.out.println(ficheroSalidaNombre);
+		
+		
+		File ficheroSalida = new File(ruta.getAbsolutePath() + "\\analisisXML_"+ficheroSalidaNombre+".txt");
+		
 		if (ficheroSalida.exists()) {
 			ficheroSalida.delete();
 		}
 		
-		List<File> listaFicherosXML = new ArrayList<File>();
-		List<File> listaFicherosXML_validos = new ArrayList<File>();
-		listaFicherosXML = Archivos.listarArchivosXMLRecursivamente(ruta);			
 				
 		// se recorre todos los archivos y crea un objeto tipo DatosFicheroXML por fichero valido	
 		int nFicheroValidado = 0;
@@ -51,7 +61,7 @@ public class main {
 		}
 		
 
-		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+		
 		timestamp = new Timestamp(System.currentTimeMillis());
 		texto = timestamp+" - " + "Comienza el analisis de ficheros: .....\n";
 		System.out.println(timestamp);
@@ -112,12 +122,10 @@ public class main {
 			
 			texto="getPathScriptsAutomaticos: "+ datosFicheroXML.getPathScriptsAutomaticos();
 			System.out.println(texto);
-			escribeResultados.escribe(texto+"\n", ficheroSalida);
-			
+			escribeResultados.escribe(texto+"\n", ficheroSalida);			
 						
 			// se busca en los scripts------------------------------------------------			
-			//el for de inFileScript es para cada script			
-			
+			//el for de inFileScript es para cada script					
 			int usadoElemRepes=0;
 			for (int inFileScript = 0; inFileScript < listaFicherosScriptTotales.size(); inFileScript++) {			    
 			    //buscar elementos con nombre repetido en cada script //listaNombreObjetosRepetidosEnXML
@@ -141,16 +149,12 @@ public class main {
 		    
 			texto = "elementosRepesUsadosTotal: " + elementosRepesUsadosTotal;
 			System.out.println(texto);
-			escribeResultados.escribe(texto+"\n", ficheroSalida);
-		    
+			escribeResultados.escribe(texto+"\n", ficheroSalida);		    
 		    
 			texto = "duracion: " + milisenconds+" mseg\n\n\n";
 			System.out.println(texto);
 			escribeResultados.escribe(texto+"\n", ficheroSalida);
-
 		}
-		
-		
 		
 		texto = "elementosRepesUsadosTotal: " + elementosRepesUsadosTotal;
 		System.out.println(texto);
