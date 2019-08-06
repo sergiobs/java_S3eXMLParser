@@ -10,12 +10,12 @@ import java.sql.Timestamp;
 //     * listaDatosFicheroXML pasa a ser datosFicheroXML
 //     * el parseador de XML se mete en la clase DatosFichero
 //018: * Se leen sicamPC y se obtiene lista de ficheros script
-//		
+//019: * Se hace busqueda de elementos repetidos en script		
 //
 
 public class main {
 	// indicamos la ruta donde vamos a buscar los xml	
-	static String rutaBase = "C:\\temp3";
+	static String rutaBase = "C:\\temp4";
 	//static String rutaBase = "C:\\CAFs_SBS\\ENCE\\ramas\\ENCE_DESARROLLO\\SIST\\Validación\\Entorno\\ContextosPrueba\\";
 	static File ruta = new File(rutaBase);
 	
@@ -56,6 +56,8 @@ public class main {
 		texto = timestamp+" - " + "Comienza el analisis de ficheros: .....\n";
 		System.out.println(timestamp);
 		escribeResultados.escribe(texto+"\n", ficheroSalida);
+		
+		int elementosRepesUsadosTotal=0;
 				
 		// bucle para procesar cada objeto contenido en el array de listaDatosFicheroXML			
 		for (indiceFichero=0;indiceFichero<listaFicherosXML_validos.size();indiceFichero++){
@@ -101,40 +103,59 @@ public class main {
 			Timestamp timestamp2 = new Timestamp(System.currentTimeMillis());
 			long milisenconds = timestamp2.getTime()-timestamp1.getTime();
 			
-			// se busca en los scripts
-			int nFicheroScriptValidado = 0;
-			for (int i = 0; i < listaFicherosXML.size(); i++) {
-				List<File> listaFicherosScriptTotales = new ArrayList<File>();
-				
-				File auxF = datosFicheroXML.getFileScriptsAutomaticos() ;
-				
-				listaFicherosScriptTotales = Archivos.listarArchivosScript(datosFicheroXML.getFileScriptsAutomaticos());		
-				
-			    File ficheroScript = listaFicherosScriptTotales.get(i);
-			    
-			    
-//			    boolean esS3e = Archivos.ficheroXMLValido(ficheroXMLaValidar);
-//			   		
-//				if (esS3e) {
-//					nFicheroScriptValidado++;
-//					listaFicherosXML_validos.add(ficheroXMLaValidar);
-//					//datosFicheroXML.add(new DatosFicheroXML());
-//					//datosFicheroXML.get(nFicheroValidado-1).setFichero(listaFicherosXML.get(i));
-//					texto=nFicheroScriptValidado+ "\t "+listaFicherosXML_validos.get(nFicheroScriptValidado-1);
-//					System.out.println(texto);
-//					escribeResultados.escribe(texto+"\n", ficheroSalida);
-//				}
+			List<File> listaFicherosScriptTotales = new ArrayList<File>();		
+			listaFicherosScriptTotales = Archivos.listarArchivosScript(datosFicheroXML.getFileScriptsAutomaticos());
+			int longitud = listaFicherosScriptTotales.size();
+			texto="numero de scripts: "+ longitud;
+			System.out.println(texto);
+			escribeResultados.escribe(texto+"\n", ficheroSalida);
+			
+			texto="getPathScriptsAutomaticos: "+ datosFicheroXML.getPathScriptsAutomaticos();
+			System.out.println(texto);
+			escribeResultados.escribe(texto+"\n", ficheroSalida);
+			
+						
+			// se busca en los scripts------------------------------------------------			
+			//el for de inFileScript es para cada script			
+			
+			int usadoElemRepes=0;
+			for (int inFileScript = 0; inFileScript < listaFicherosScriptTotales.size(); inFileScript++) {			    
+			    //buscar elementos con nombre repetido en cada script //listaNombreObjetosRepetidosEnXML
+			    List<String> listaTotalNombreObjetosRepetidosEnXML = datosFicheroXML.getListaTotalNombreObjetosRepetidosEnXML();
+			    for (int iElemRep=0;iElemRep<listaTotalNombreObjetosRepetidosEnXML.size();iElemRep++) {
+			    	texto = datosFicheroXML.buscaStringScript(listaTotalNombreObjetosRepetidosEnXML.get(iElemRep), 
+			    			listaFicherosScriptTotales.get(inFileScript));
+					if (texto.length()>0) {
+						usadoElemRepes++;
+						elementosRepesUsadosTotal++;
+				    	System.out.println(texto);
+						escribeResultados.escribe(texto+"\n", ficheroSalida);
+					}
+			    }
 			}
-			
-			
-			
-			
-			
+		    if (usadoElemRepes==0) {
+		    	texto = "INFO: No se usan elementos repes en scripts.";
+		    	System.out.println(texto);
+				escribeResultados.escribe(texto+"\n", ficheroSalida);
+		    }
+		    
+			texto = "elementosRepesUsadosTotal: " + elementosRepesUsadosTotal;
+			System.out.println(texto);
+			escribeResultados.escribe(texto+"\n", ficheroSalida);
+		    
+		    
 			texto = "duracion: " + milisenconds+" mseg\n\n\n";
 			System.out.println(texto);
 			escribeResultados.escribe(texto+"\n", ficheroSalida);
 
 		}
+		
+		
+		
+		texto = "elementosRepesUsadosTotal: " + elementosRepesUsadosTotal;
+		System.out.println(texto);
+		escribeResultados.escribe(texto+"\n", ficheroSalida);
+		
 		texto = "****************************************************\nFin del analisis\n\n\n";
 		System.out.println(texto);
 		escribeResultados.escribe(texto+"\n", ficheroSalida);

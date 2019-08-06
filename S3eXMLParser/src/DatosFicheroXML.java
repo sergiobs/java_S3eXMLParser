@@ -52,6 +52,7 @@ public class DatosFicheroXML {
 		return numeroObjetosS3e;
 	}
 	
+	
 	// setters
 	public void setFichero(File fichero) {
 		this.fichero = fichero;
@@ -67,6 +68,18 @@ public class DatosFicheroXML {
 	public void addIdentificadorObjetoEnXML(String identificadorObjetoEnXML, int indice) {
 		this.listaIdentificadorObjetosEnXML.get(indice).add(identificadorObjetoEnXML);
 	}
+	
+	//devuelve en una unica lista todos los obejtos repetidos
+	public List<String> getListaTotalNombreObjetosRepetidosEnXML() {
+		List<String> listaTotalNombreObjetosRepetidosEnXML = new ArrayList<String>();
+		for (int i=0;i<numeroObjetosS3e;i++) {
+			for (int j=0;j<listaNombreObjetosRepetidosEnXML.get(i).size();j++) {
+				listaTotalNombreObjetosRepetidosEnXML.add(listaNombreObjetosRepetidosEnXML.get(i).get(j));
+			}
+		}		
+		return listaTotalNombreObjetosRepetidosEnXML;
+	}	
+	
 	
 	// constructor
 	public DatosFicheroXML (File ficheroXML) {
@@ -146,14 +159,9 @@ public class DatosFicheroXML {
 		if (fichero.exists()) {
 			parseaSicamPcXML();
 			fileScriptsAutomaticos = new File(pathScriptsAutomaticos);
-			
-			
-		}else {
+		} else {
 			System.out.println("No existe sicampc.xml");
-		}
-		
-		
-		
+		}		
 	}
 	
 	public void parseaXMLS3e () {
@@ -349,6 +357,49 @@ public class DatosFicheroXML {
 			}
 		}
 	}
+	
+	public String buscaStringScript (String stringBuscar, File fileScript) {
+		String imprimeError ="";
+		try {
+			int apariciones = 0;
+			Scanner sc = new Scanner(fileScript);
+			String linea = "";
+			
+			
+			//System.out.println("Analizamos: "+ stringBuscar + "\t"+  fileScript);
+			//this.listaIdentificadorUsadosObjetosEnXML.get(inTipoObjetoS3e).add(false);
+			while (sc.hasNext()) {
+				linea = sc.nextLine();
+				if (    
+						linea.contains(" "+stringBuscar+" ")||
+						linea.contains(","+stringBuscar+",")||
+						linea.contains(","+stringBuscar+")")||
+						linea.contains("("+stringBuscar+",")||
+						
+						linea.contains("\""+stringBuscar+"\"")||
+						
+						linea.contains(" "+stringBuscar+",")||
+						linea.contains(","+stringBuscar+" ")||
+						linea.contains("("+stringBuscar+" ")||
+						linea.contains(" "+stringBuscar+")")
+
+						) {
+					apariciones++;
+					if (apariciones > 0) {						
+						imprimeError = "ERROR: Se usa elemento repetido (" + stringBuscar + ") en script: " + fileScript;
+						//System.out.println("ERROR: Se usa en script: "+ stringBuscar + "en: " + fileScript );
+					}						
+				}
+			}
+			sc.close();		
+							
+		} catch (IOException e) {
+			e.printStackTrace();
+			return  imprimeError+" " + e;
+		}
+		return  imprimeError;
+	}
+	
 	
 	private int devuelveIndiceObjetoS3e(String nombreObjetoS3e) {
 		for (int i = 0; i<numeroObjetosS3e; i++) {

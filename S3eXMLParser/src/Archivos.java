@@ -11,7 +11,7 @@ import java.util.List;
 public class Archivos {
 	
 	static List<File> listaFicherosXML = new ArrayList<File>();
-	static List<File> listaFicherosScript = new ArrayList<File>();
+	static List<File> listaFicherosScriptRec = new ArrayList<File>();
 
 	public static ArrayList<File> listarArchivosXMLRecursivamente(File file) {	   	
 		File[] ficheros = file.listFiles();
@@ -27,20 +27,25 @@ public class Archivos {
 		return  (ArrayList<File>) listaFicherosXML;
 	}	 
 	
-	public static ArrayList<File> listarArchivosScript(File file) {	   	
-		//List<File> listaFicherosScript = new ArrayList<File>();
-		File[] ficheros = file.listFiles();
-
+	public static ArrayList<File> listarArchivosScriptRec(File file) {	
+		File[] ficheros = file.listFiles();		
 		for (int i = 0; i < ficheros.length; i++) {
 			if (ficheros[i].isDirectory()) {
-				listarArchivosScript(ficheros[i]);
+				listarArchivosScriptRec(ficheros[i]);
 			} else if (getExtension(ficheros[i].getName()).equals("script"))
 			{
-				listaFicherosScript.add(ficheros[i]);				
+				listaFicherosScriptRec.add(ficheros[i]);				
 			}
 		}		
-		return  (ArrayList<File>) listaFicherosScript;
-	}		
+		return  (ArrayList<File>) listaFicherosScriptRec;
+	}
+	
+	public static ArrayList<File> listarArchivosScript(File file) {	
+		List<File> listaFicherosScript = new ArrayList<File>();
+		listaFicherosScriptRec.clear();
+		listaFicherosScript = listarArchivosScriptRec (file);
+		return (ArrayList<File>) listaFicherosScript;
+	}	
 	
 	public static boolean ficheroXMLValido(File file)  {		
 		FileReader fr;
