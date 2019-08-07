@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.sql.Timestamp;
 
-
 //016 		* versión que calcula identificadores no usados
 //017 		* Ya no se usa lista de objetos (un objeto por fichero).
 //  		* listaDatosFicheroXML pasa a ser datosFicheroXML
@@ -15,8 +14,8 @@ import java.sql.Timestamp;
 
 public class main {
 	// indicamos la ruta donde vamos a buscar los xml	
-	static String rutaBase = "C:\\temp4";
-	//static String rutaBase = "C:\\CAFs_SBS\\ENCE\\ramas\\ENCE_DESARROLLO\\SIST\\ValidaciÃ³n\\Entorno\\ContextosPrueba\\";
+	//static String rutaBase = "C:\\temp4";
+	static String rutaBase = "C:\\CAFs_SBS\\ENCE\\ramas\\ENCE_DESARROLLO\\SIST\\Validación\\Entorno\\";
 	static File ruta = new File(rutaBase);
 	
 	
@@ -34,13 +33,11 @@ public class main {
 		//ficheroSalidaNombre="";
 		System.out.println(ficheroSalidaNombre);
 		
-		
 		File ficheroSalida = new File(ruta.getAbsolutePath() + "\\analisisXML_"+ficheroSalidaNombre+".txt");
 		
 		if (ficheroSalida.exists()) {
 			ficheroSalida.delete();
 		}
-		
 				
 		// se recorre todos los archivos y crea un objeto tipo DatosFicheroXML por fichero valido	
 		int nFicheroValidado = 0;
@@ -59,9 +56,7 @@ public class main {
 				escribeResultados.escribe(texto+"\n", ficheroSalida);
 			}
 		}
-		
-
-		
+				
 		timestamp = new Timestamp(System.currentTimeMillis());
 		texto = timestamp+" - " + "Comienza el analisis de ficheros: .....\n";
 		System.out.println(timestamp);
