@@ -16,8 +16,8 @@ import java.sql.Timestamp;
 
 public class main {
 	// indicamos la ruta donde vamos a buscar los xml	
-	static String rutaBase = "C:\\temp5";
-	//static String rutaBase = "C:\\CAFs_SBS\\ENCE\\ramas\\ENCE_DESARROLLO\\SIST\\Validación\\Entorno\\";
+	//static String rutaBase = "C:\\temp5";
+	static String rutaBase = "C:\\CAFs_SBS\\ENCE\\ramas\\ENCE_DESARROLLO\\SIST\\Validación\\Entorno\\";
 	static File ruta = new File(rutaBase);
 	
 	
