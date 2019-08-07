@@ -118,6 +118,12 @@ public class DatosFicheroXML {
 		//listaNombreObjetosS3e.add("IAS");
 		//listaNombreObjetosS3e.add("CSC");
 		//listaNombreObjetosS3e.add("GIM");
+	
+		
+		listaNombreObjetosS3e_inMCS.add("MF");
+		listaNombreObjetosS3e_inMCS.add("ED");
+		listaNombreObjetosS3e_inMCS.add("SD");
+		listaNombreObjetosS3e_inMCS.add("MA");
 		
 		
 		//listaNombreObjetosS3e.add("ED_local");
@@ -158,10 +164,27 @@ public class DatosFicheroXML {
 		parseaXMLS3e();
 		if (fichero.exists()) {
 			parseaSicamPcXML();
-			fileScriptsAutomaticos = new File(pathScriptsAutomaticos);
+			if (pathScriptsAutomaticos!=null) {
+				fileScriptsAutomaticos = new File(pathScriptsAutomaticos);
+			} else { 
+				System.out.println("No hay pathScriptsAutomaticos en sicampc.xml");
+			}
 		} else {
 			System.out.println("No existe sicampc.xml");
 		}		
+		
+		
+		
+		// Se buscan los objetos que estan en las MCS para ver su grado de ocupacion
+		for (int i=0; i<listaNombreObjetosS3e_inMCS.size(); i++) {
+		
+		}
+		//parseaXMLS3e_inMCS();
+		
+		
+		
+		
+		
 	}
 	
 	public void parseaXMLS3e () {
@@ -191,6 +214,35 @@ public class DatosFicheroXML {
 		}
 	}
 	
+	
+	public void parseaXMLS3e_inMCS () {
+		try {
+			SAXParserFactory factory2 = SAXParserFactory.newInstance();
+			SAXParser saxParser2 = factory2.newSAXParser();
+			
+			DefaultHandler handler = new DefaultHandler() {
+				public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+					String etiqueta = qName;
+
+					for (int startE=0; startE<listaNombreObjetosS3e_inMCS.size(); startE ++) {
+						// si la cabecera leida del xml esta en mi lista de obj s3e
+						
+						if (etiqueta.equalsIgnoreCase(listaNombreObjetosS3e_inMCS.get(startE))) {
+							listaNombreObjetosEnXML.get(startE).add(attributes.getValue("Nombre"));
+							listaIdentificadorObjetosEnXML.get(startE).add(attributes.getValue("Identificador"));							
+						}
+					}
+				}				
+			};			
+			
+			saxParser2.parse(fichero, handler);
+			
+		} catch (Exception e) {
+			System.out.println("main: " + e);
+			e.printStackTrace();
+		}
+	}
+	
 	public void parseaSicamPcXML() {
 		try {
 			SAXParserFactory factory2 = SAXParserFactory.newInstance();
@@ -203,16 +255,13 @@ public class DatosFicheroXML {
 					String valor = attributes.getValue("PathScriptsAutomaticos");
 
 					// buscamos el startElement en nuestra lista de objetos a evaluar
-					if (etiqueta.equalsIgnoreCase("Proceso")&&(atributo.equals("IHM"))) {							
+					if (etiqueta.equalsIgnoreCase("Proceso")&&(atributo.equals("IHM"))) {
+						//puede no existir pathScriptsAutomaticos						
 						pathScriptsAutomaticos = valor;
-						//System.out.println("pathScriptsAutomaticos1: " + pathScriptsAutomaticos);
-						pathScriptsAutomaticos = pathScriptsAutomaticos.replace("/", "\\");
-						//System.out.println("pathScriptsAutomaticos2: " + pathScriptsAutomaticos);
-						//pathScriptsAutomaticos = fichero.getPath()+pathScriptsAutomaticos;
-						//pathScriptsAutomaticos = fichero.getPath().substring(0, fichero.getPath().length() - nombreFichero.length())+"\\..\\..\\";
-						pathScriptsAutomaticos = pathSicamPCXML + pathScriptsAutomaticos;						
-						//System.out.println("pathScriptsAutomaticos3: " + pathScriptsAutomaticos);
-
+						if (valor != null) {
+							pathScriptsAutomaticos = pathScriptsAutomaticos.replace("/", "\\");
+							pathScriptsAutomaticos = pathSicamPCXML + pathScriptsAutomaticos;	
+						}
 					}
 				}				
 			};			
@@ -414,12 +463,16 @@ public class DatosFicheroXML {
 	private String nombreFichero;
 	private String pathScriptsAutomaticos;
 	private String pathSicamPCXML;
+	private List<MCS> MCSs = new ArrayList<MCS>();
 	private List<String> listaNombreObjetosS3e = new ArrayList<String>();
 	private List<Integer> listaNumeroObjetosS3e = new ArrayList<Integer>();
 	private List<List<String>> listaNombreObjetosRepetidosEnXML = new ArrayList<List<String>>();
 	private List<List<String>> listaNombreObjetosEnXML = new ArrayList<List<String>>();
 	private List<List<String>> listaIdentificadorObjetosEnXML = new ArrayList<List<String>>();
 	private List<List<String>> listaIdentificadorObjetos_noUsadosEnXML = new ArrayList<List<String>>();
+	
+	private List<String> listaNombreObjetosS3e_inMCS = new ArrayList<String>(); //lista de objetos que se van a ir identificando e incrustando en las MCS para contar lo llenas q estan
+	
 	private List<List<Boolean>> listaIdentificadorUsadosObjetosEnXML = new ArrayList<List<Boolean>>();
 	private File fichero = new File("");
 	private File ficheroSicamPC = new File("");

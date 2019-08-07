@@ -12,11 +12,12 @@ import java.sql.Timestamp;
 //019 		* Se hace busqueda de elementos repetidos en script		
 //				019.01 	* fichero de salida contiene timestamp en su nombre
 //              019.02 	* se tiene en cuenta que puede no existir ficheros de script
+//				019.03 	* se tiene en cuenta que puede no haber pathScriptsAutomaticos en sicamPC.xml
 
 public class main {
 	// indicamos la ruta donde vamos a buscar los xml	
-	//static String rutaBase = "C:\\temp5";
-	static String rutaBase = "C:\\CAFs_SBS\\ENCE\\ramas\\ENCE_DESARROLLO\\SIST\\Validación\\Entorno\\";
+	static String rutaBase = "C:\\temp5";
+	//static String rutaBase = "C:\\CAFs_SBS\\ENCE\\ramas\\ENCE_DESARROLLO\\SIST\\Validación\\Entorno\\";
 	static File ruta = new File(rutaBase);
 	
 	
@@ -109,34 +110,29 @@ public class main {
 			Timestamp timestamp2 = new Timestamp(System.currentTimeMillis());
 			long milisenconds = timestamp2.getTime()-timestamp1.getTime();
 			
+			
+			// BUSQUEDA DE ELEMENTOS REPETIDOS EN SCRIPTS _______________________________________________________________
 			List<File> listaFicherosScriptTotales = new ArrayList<File>();		
 			texto="datosFicheroXML.getFileScriptsAutomaticos(): " + datosFicheroXML.getFileScriptsAutomaticos();
 			System.out.println(texto);
-			escribeResultados.escribe(texto+"\n", ficheroSalida);
+			escribeResultados.escribe(texto+"\n", ficheroSalida);			
 			
-			
-			boolean existeScripts=false;
-			
-			if (datosFicheroXML.getFileScriptsAutomaticos().exists()) {
-				existeScripts = true;
-				listaFicherosScriptTotales = Archivos.listarArchivosScript(datosFicheroXML.getFileScriptsAutomaticos());				
+			boolean existeScripts=false;	
+			if (datosFicheroXML.getFileScriptsAutomaticos()!=null) {
+				if (datosFicheroXML.getFileScriptsAutomaticos().exists()) {
+					existeScripts = true;
+					listaFicherosScriptTotales = Archivos.listarArchivosScript(datosFicheroXML.getFileScriptsAutomaticos());				
+				} else {
+					texto="ERROR. No se encuentra carpeta de scripts";
+					System.out.println(texto);
+					escribeResultados.escribe(texto+"\n", ficheroSalida);
+				}
 			} else {
-				texto="ERROR. No se encuentra carpeta de scripts";
+				texto="ERROR. No se ha declarado pathScriptsAutomaticos en sicamPC.sml";
 				System.out.println(texto);
 				escribeResultados.escribe(texto+"\n", ficheroSalida);
 			}
-			
-//			if (Archivos.listarArchivosScript(datosFicheroXML.getFileScriptsAutomaticos())!=null) {			
-//				listaFicherosScriptTotales = Archivos.listarArchivosScript(datosFicheroXML.getFileScriptsAutomaticos());
-//				existeScripts = true;
-//			} else {
-//				texto="ERROR. No se encuentra carptea de scripts";
-//				System.out.println(texto);
-//				escribeResultados.escribe(texto+"\n", ficheroSalida);
-//			}
-			
-			
-			
+
 			
 			int longitud = listaFicherosScriptTotales.size();
 			texto="numero de scripts: "+ longitud;
@@ -168,7 +164,12 @@ public class main {
 		    	texto = "INFO: No se usan elementos repes en scripts.";
 		    	System.out.println(texto);
 				escribeResultados.escribe(texto+"\n", ficheroSalida);
-		    }
+		    }		    
+		    // ____________________________________________________________________________________________
+		    
+		    
+		    
+		    
 		    
 			texto = "elementosRepesUsadosTotal: " + elementosRepesUsadosTotal;
 			System.out.println(texto);
