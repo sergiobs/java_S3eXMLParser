@@ -11,6 +11,7 @@ import java.sql.Timestamp;
 //018 		* Se leen sicamPC y se obtiene lista de ficheros script
 //019 		* Se hace busqueda de elementos repetidos en script		
 //				019.01 	* fichero de salida contiene timestamp en su nombre
+//              019.02 	* cambios menores
 
 public class main {
 	// indicamos la ruta donde vamos a buscar los xml	
