@@ -51,6 +51,9 @@ public class DatosFicheroXML {
 	public Integer getNumeroObjetosS3e() {
 		return numeroObjetosS3e;
 	}
+	public File getFicheroSicamPC() {
+		return ficheroSicamPC;
+	}
 	
 	
 	// setters
@@ -140,6 +143,8 @@ public class DatosFicheroXML {
 		//localizamos el sicampc.xml		
 		pathSicamPCXML = fichero.getPath().substring(0, fichero.getPath().length() - nombreFichero.length())+"\\..\\..\\";
 		ficheroSicamPC = new File(pathSicamPCXML+"sicampc.xml");
+
+		
 				
 		// se crea una lista de numObjS3e elementos que contendra el numero de objetos de cada tipo (numeroMCS, numeroED, numeroSD, )
 		// inicialmente todos con valor 0
@@ -162,29 +167,23 @@ public class DatosFicheroXML {
 			this.listaIdentificadorObjetos_noUsadosEnXML.add(new ArrayList<String>());			
 		}		
 		parseaXMLS3e();
-		if (fichero.exists()) {
-			parseaSicamPcXML();
+		if (ficheroSicamPC.exists()) {
+			parsea_SicamPcXML();
 			if (pathScriptsAutomaticos!=null) {
 				fileScriptsAutomaticos = new File(pathScriptsAutomaticos);
 			} else { 
 				System.out.println("No hay pathScriptsAutomaticos en sicampc.xml");
 			}
 		} else {
-			System.out.println("No existe sicampc.xml");
+			//System.out.println("No existe sicampc.xml");
+			ficheroSicamPC=null;
 		}		
-		
-		
-		
+				
 		// Se buscan los objetos que estan en las MCS para ver su grado de ocupacion
 		for (int i=0; i<listaNombreObjetosS3e_inMCS.size(); i++) {
 		
 		}
 		//parseaXMLS3e_inMCS();
-		
-		
-		
-		
-		
 	}
 	
 	public void parseaXMLS3e () {
@@ -243,7 +242,7 @@ public class DatosFicheroXML {
 		}
 	}
 	
-	public void parseaSicamPcXML() {
+	public void parsea_SicamPcXML() {
 		try {
 			SAXParserFactory factory2 = SAXParserFactory.newInstance();
 			SAXParser saxParser2 = factory2.newSAXParser();
@@ -476,6 +475,8 @@ public class DatosFicheroXML {
 	private List<List<Boolean>> listaIdentificadorUsadosObjetosEnXML = new ArrayList<List<Boolean>>();
 	private File fichero = new File("");
 	private File ficheroSicamPC = new File("");
+
+
 	private File fileScriptsAutomaticos;
 	private int numeroObjetosS3e;		
 
