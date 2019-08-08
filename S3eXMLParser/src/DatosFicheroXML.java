@@ -87,23 +87,35 @@ public class DatosFicheroXML {
 	// constructor
 	public DatosFicheroXML (File ficheroXML) {
 		
+//		listaNombreObjetosS3e.add("ED2/Ubicacion=ED_Local/Tipo=ED_dobleHilo");
+//		listaNombreObjetosS3e.add("ED2/Ubicacion=ED_Local/Tipo=ED_dobleConjugada");
+//		listaNombreObjetosS3e.add("ED2/Ubicacion=ED_Local/Tipo=ccc");
+//		listaNombreObjetosS3e.add("ED2/Ubicacion=ED_Local");
+//		listaNombreObjetosS3e.add("ED2/Tipo=ccc");
+		
+		listaNombreObjetosS3e.add("ED/Ubicacion=ED_Local/Tipo=ED_dobleHilo");
+		listaNombreObjetosS3e.add("ED/Ubicacion=ED_Local/Tipo=ED_dobleConjugada");
+		listaNombreObjetosS3e.add("ED/Ubicacion=ED_Local/Tipo=ED_simpleHilo");
+		
+		listaNombreObjetosS3e.add("ED");
 		listaNombreObjetosS3e.add("MCS");
-		listaNombreObjetosS3e.add("CSE");
+		//listaNombreObjetosS3e.add("CSE");
 		listaNombreObjetosS3e.add("ED");
 		listaNombreObjetosS3e.add("SD");
 		listaNombreObjetosS3e.add("MF");
 		listaNombreObjetosS3e.add("MA");
+		listaNombreObjetosS3e.add("MM");
 		listaNombreObjetosS3e.add("IF");
 		listaNombreObjetosS3e.add("IS");
-		listaNombreObjetosS3e.add("PV");
+		//listaNombreObjetosS3e.add("PV");
 		listaNombreObjetosS3e.add("SE");
 		listaNombreObjetosS3e.add("CV");
 		listaNombreObjetosS3e.add("AG");
-		listaNombreObjetosS3e.add("CES");
+		//listaNombreObjetosS3e.add("CES");
 		//listaNombreObjetosS3e.add("ALG");
 		//listaNombreObjetosS3e.add("EDNV");
 		//listaNombreObjetosS3e.add("DCO");
-		listaNombreObjetosS3e.add("SC");
+		//listaNombreObjetosS3e.add("SC");
 		//listaNombreObjetosS3e.add("DAS");
 		//listaNombreObjetosS3e.add("DPT");
 		//listaNombreObjetosS3e.add("DR");
@@ -121,7 +133,14 @@ public class DatosFicheroXML {
 		//listaNombreObjetosS3e.add("IAS");
 		//listaNombreObjetosS3e.add("CSC");
 		//listaNombreObjetosS3e.add("GIM");
-	
+		
+		listaNombreObjetosS3e.add("SD_local");
+		listaNombreObjetosS3e.add("MF_local");
+		
+		listaNombreObjetosS3e.add("MCS_focos");
+		listaNombreObjetosS3e.add("MCS_ESgeneral");
+		listaNombreObjetosS3e.add("MCS_ES_hiloDoble");
+		
 		
 		listaNombreObjetosS3e_inMCS.add("MF");
 		listaNombreObjetosS3e_inMCS.add("ED");
@@ -129,9 +148,7 @@ public class DatosFicheroXML {
 		listaNombreObjetosS3e_inMCS.add("MA");
 		
 		
-		//listaNombreObjetosS3e.add("ED_local");
-		//listaNombreObjetosS3e.add("SD_local");
-		//listaNombreObjetosS3e.add("MF_local");
+
 		
 		this.numeroObjetosS3e = listaNombreObjetosS3e.size();
 		this.fichero = ficheroXML;
@@ -196,15 +213,67 @@ public class DatosFicheroXML {
 					String etiqueta = qName;
 					// buscamos el startElement en nuestra lista de objetos a evaluar
 					for (int startE=0; startE<numeroObjetosS3e; startE ++) {
-						// si la cabecera leida del xml esta en mi lista de obj s3e
-						if (etiqueta.equalsIgnoreCase(listaNombreObjetosS3e.get(startE))) {
+						
+						boolean elementoSimple_analizado = false;
+						//para recoger los de tipo "ED", "SD", "MO", ....
+						if (etiqueta.equalsIgnoreCase(listaNombreObjetosS3e.get(startE))) {						
 							listaNombreObjetosEnXML.get(startE).add(attributes.getValue("Nombre"));
-							listaIdentificadorObjetosEnXML.get(startE).add(attributes.getValue("Identificador"));							
+							listaIdentificadorObjetosEnXML.get(startE).add(attributes.getValue("Identificador"));		
+							elementoSimple_analizado = true;
 						}
+						
+						if (true) {
+							List<String> xxxx = new ArrayList<String>();
+							xxxx		= utilidades.analizaObjArgs(listaNombreObjetosS3e.get(startE));
+							int nro_argumentos = (xxxx.size()-1)/2;
+							
+							xxxx.get(0);
+							boolean cumpleCriterio = true;
+							
+							if (etiqueta.equalsIgnoreCase(xxxx.get(0))&&xxxx.size()>1) {
+								// recorremos bucle para ver que se cumplen todos los pares de arg/val
+								// si todos los pares se cumplen, cumpleCriterio = true
+								for (int j=0;j<nro_argumentos;j++) {								
+									
+									if (!xxxx.get(2*j+2).equalsIgnoreCase(attributes.getValue(xxxx.get(2*j+1)))) {
+										cumpleCriterio = false;
+									}
+								}
+								
+								if (cumpleCriterio) {
+									listaNombreObjetosEnXML.get(startE).add(attributes.getValue("Nombre"));
+									listaIdentificadorObjetosEnXML.get(startE).add(attributes.getValue("Identificador"));
+									//System.out.println(xxxx+ ": "+attributes.getValue("Nombre")+", " );
+								}
+								
+								
+								
+							}
+						}
+						
+//						List<String> borrame = new ArrayList<String>(); 
+//						//borrame		= utilidades.analizaObjArgs("ED/Ubicacion=ED_Local/Tipo=ED_dobleHilo");
+//						borrame		= utilidades.analizaObjArgs("ED");
+						
+						
+//						//para recoger los que tienen ubicación tipo Obj/Arg1=val1/Arg2=val2 
+//						// por ejemplo ("ED/Ubicacion=ED_Local/Tipo=ED_dobleHilo") 
+//						
+//						//para recoger los que tienen ubicación tipo "MF_Local" , ....
+//						if (listaNombreObjetosS3e.get(startE).equalsIgnoreCase(attributes.getValue("Ubicacion"))) {							
+//							listaNombreObjetosEnXML.get(startE).add(attributes.getValue("Nombre"));
+//							listaIdentificadorObjetosEnXML.get(startE).add(attributes.getValue("Identificador"));
+//						}	
+//						
+//						//para recoger los que tienen TipoDeMCS tipo "....
+//						if (listaNombreObjetosS3e.get(startE).equalsIgnoreCase(attributes.getValue("TipoDeMCS"))) {							
+//							listaNombreObjetosEnXML.get(startE).add(attributes.getValue("Nombre"));
+//							listaIdentificadorObjetosEnXML.get(startE).add(attributes.getValue("Identificador"));
+//						}							
+						
 					}
 				}				
-			};			
-			
+			};
 			saxParser2.parse(fichero, handler);
 			
 		} catch (Exception e) {
@@ -212,8 +281,7 @@ public class DatosFicheroXML {
 			e.printStackTrace();
 		}
 	}
-	
-	
+
 	public void parseaXMLS3e_inMCS () {
 		try {
 			SAXParserFactory factory2 = SAXParserFactory.newInstance();

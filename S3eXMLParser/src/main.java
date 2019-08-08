@@ -16,6 +16,7 @@ import java.sql.Timestamp;
 //				019.03 	* se tiene en cuenta que puede no haber pathScriptsAutomaticos en sicamPC.xml
 //				019.04 	* se tiene en cuenta que puede no haber fichero sicamPC.xml
 //                      * Se habilita lectura de argumento de entrada para indicar ruta
+//020 		* Lee tipos de objeto de S3e que cumplan criterios de varios arguemntos/valores
 
 public class main {
 	//static int indiceFichero=0;
