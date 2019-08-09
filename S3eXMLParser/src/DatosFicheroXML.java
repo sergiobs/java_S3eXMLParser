@@ -33,23 +33,23 @@ public class DatosFicheroXML {
 		return fileScriptsAutomaticos;
 	}
 	public List<Integer> getListaNumeroObjetosS3e() {
-		return listaNumeroObjetosS3e;
+		return lista_Obj_S3e_CANTIDAD;
 	}	
 	public List<List<String>> getListaNombreObjetosRepetidosEnXML() {
-		return listaNombreObjetosRepetidosEnXML;
+		return obj_XML_NOMBRE_Repetidos;
 	}
 	public List<List<String>> getListaIdentificadorObjetosEnXML() {
-		return listaIdentificadorObjetosEnXML;
+		return obj_XML_Id;
 	}
 	public List<List<String>> getListaNombreObjetosEnXML() {
-		return listaNombreObjetosEnXML;
+		return obj_XML_NOMBRE;
 	}
 	public List<String> getListaNombreObjetosS3e() {
-		return listaNombreObjetosS3e;
+		return lista_Obj_S3e_NOMBRE;
 	}
 	
 	public Integer getNumeroObjetosS3e() {
-		return numeroObjetosS3e;
+		return num_Obj_S3e;
 	}
 	public File getFicheroSicamPC() {
 		return ficheroSicamPC;
@@ -73,6 +73,80 @@ public class DatosFicheroXML {
 		return n_estimados_MCS_ESHD;
 	}
 	
+	// constructor
+		public DatosFicheroXML (File ficheroXML) {
+			lista_Obj_S3e_NOMBRE.add("MCS/TipoDeMCS=MCS_focos");
+			lista_Obj_S3e_NOMBRE.add("MCS/TipoDeMCS=MCS_ESgeneral");
+			lista_Obj_S3e_NOMBRE.add("MCS/TipoDeMCS=MCS_ES_hiloDoble");
+			lista_Obj_S3e_NOMBRE.add("MF/Ubicacion=MF_Local/TipoFoco=MF_noIntermApagado");
+			lista_Obj_S3e_NOMBRE.add("MF/Ubicacion=MF_Local/TipoFoco=MF_noIntermEncendido");
+			lista_Obj_S3e_NOMBRE.add("MF/Ubicacion=MF_Local/TipoFoco=MF_IntermApagado");
+			lista_Obj_S3e_NOMBRE.add("MF/Ubicacion=MF_Local/TipoFoco=MF_InterEncFijoReposo");	
+			lista_Obj_S3e_NOMBRE.add("ED/Ubicacion=ED_Local/Tipo=ED_dobleHilo");
+			lista_Obj_S3e_NOMBRE.add("ED/Ubicacion=ED_Local/Tipo=ED_dobleConjugada");
+			lista_Obj_S3e_NOMBRE.add("ED/Ubicacion=ED_Local/Tipo=ED_simpleHilo");
+			lista_Obj_S3e_NOMBRE.add("SD/Ubicacion=SD_Local/Tipo=SD_simple");
+			lista_Obj_S3e_NOMBRE.add("SD/Ubicacion=SD_Local/Tipo=SD_doble");	
+			lista_Obj_S3e_NOMBRE.add("MA");
+			lista_Obj_S3e_NOMBRE.add("MM");
+			//listaNombreObjetosS3e.add("MCS");		
+			//lista_Obj_S3e_NOMBRE.add("ED");	
+			//listaNombreObjetosS3e.add("CSE");		
+			//lista_Obj_S3e_NOMBRE.add("SD");
+			//lista_Obj_S3e_NOMBRE.add("MF");
+			lista_Obj_S3e_NOMBRE.add("IF");
+			lista_Obj_S3e_NOMBRE.add("IS");
+			//listaNombreObjetosS3e.add("PV");
+			lista_Obj_S3e_NOMBRE.add("SE");
+			lista_Obj_S3e_NOMBRE.add("CV");
+			lista_Obj_S3e_NOMBRE.add("AG");
+			lista_Obj_S3e_NOMBRE.add("MO");
+			lista_Obj_S3e_NOMBRE.add("ML");		
+			this.num_Obj_S3e = lista_Obj_S3e_NOMBRE.size();
+			this.fichero = ficheroXML;
+			this.pathScriptsAutomaticos="";
+			this.pathSicamPCXML="";
+					
+			nombreFichero= fichero.getName();
+			
+			//localizamos el sicampc.xml		
+			pathSicamPCXML = fichero.getPath().substring(0, fichero.getPath().length() - nombreFichero.length())+"\\..\\..\\";
+			ficheroSicamPC = new File(pathSicamPCXML+"sicampc.xml");
+							
+			// se crea una lista de numObjS3e elementos que contendra el numero de objetos de cada tipo (numeroMCS, numeroED, numeroSD, )
+			// inicialmente todos con valor 0
+			for (int i=0; i<num_Obj_S3e; i++) 
+				this.lista_Obj_S3e_CANTIDAD.add(0);
+			
+			// se crea una lista de listas que contendran los elementos repetidos de cada tipo si los hubiese:
+			// 
+			// listaNombreObjetosRepetidosEnXML(0) 		= ("MCS_001", "MCS_001") en caso de que dos MCS tengan el mismo nombre "MCS_001"
+			// listaNombreObjetosRepetidosEnXML(1) 		= ("EDVA1", "EDVA1")
+			// listaNombreObjetosRepetidosEnXML(2) 		= vacio		
+			// ...
+			// listaNombreObjetosRepetidosEnXML(numObjS3e-1) = etc
+			
+			for (int i=0; i<num_Obj_S3e; i++) {
+				this.obj_XML_NOMBRE_Repetidos.add(new ArrayList<String>());
+				this.obj_XML_NOMBRE.add(new ArrayList<String>());
+				this.obj_XML_Id.add(new ArrayList<String>());
+				this.obj_XML_Usados.add(new ArrayList<Integer>());
+				this.listaIdentificadorObjetos_noUsadosEnXML.add(new ArrayList<String>());			
+			}		
+			parseaXMLS3e();
+			if (ficheroSicamPC.exists()) {
+				parsea_SicamPcXML();
+				if (pathScriptsAutomaticos!=null) {
+					fileScriptsAutomaticos = new File(pathScriptsAutomaticos);
+				} else { 
+					System.out.println("No hay pathScriptsAutomaticos en sicampc.xml");
+				}
+			} else {
+				//System.out.println("No existe sicampc.xml");
+				ficheroSicamPC=null;
+			}				
+		}
+	
 	// setters
 	public void setFichero(File fichero) {
 		this.fichero = fichero;
@@ -82,117 +156,24 @@ public class DatosFicheroXML {
 	}
 	
 	public void addNombreObjetoEnXML(String nombreObjetoEnXML, int indice) {
-		this.listaNombreObjetosEnXML.get(indice).add(nombreObjetoEnXML);
+		this.obj_XML_NOMBRE.get(indice).add(nombreObjetoEnXML);
 	}	
 	
 	public void addIdentificadorObjetoEnXML(String identificadorObjetoEnXML, int indice) {
-		this.listaIdentificadorObjetosEnXML.get(indice).add(identificadorObjetoEnXML);
+		this.obj_XML_Id.get(indice).add(identificadorObjetoEnXML);
 	}
 	
-	//devuelve en una unica lista todos los obejtos repetidos
+	//devuelve en una unica lista todos los objetos repetidos
 	public List<String> getListaTotalNombreObjetosRepetidosEnXML() {
 		List<String> listaTotalNombreObjetosRepetidosEnXML = new ArrayList<String>();
-		for (int i=0;i<numeroObjetosS3e;i++) {
-			for (int j=0;j<listaNombreObjetosRepetidosEnXML.get(i).size();j++) {
-				listaTotalNombreObjetosRepetidosEnXML.add(listaNombreObjetosRepetidosEnXML.get(i).get(j));
+		for (int i=0;i<num_Obj_S3e;i++) {
+			for (int j=0;j<obj_XML_NOMBRE_Repetidos.get(i).size();j++) {
+				listaTotalNombreObjetosRepetidosEnXML.add(obj_XML_NOMBRE_Repetidos.get(i).get(j));
 			}
 		}		
 		return listaTotalNombreObjetosRepetidosEnXML;
 	}	
-	
-	
-	// constructor
-	public DatosFicheroXML (File ficheroXML) {
 		
-//		listaNombreObjetosS3e.add("ED2/Ubicacion=ED_Local/Tipo=ED_dobleHilo");
-//		listaNombreObjetosS3e.add("ED2/Ubicacion=ED_Local/Tipo=ED_dobleConjugada");
-//		listaNombreObjetosS3e.add("ED2/Ubicacion=ED_Local/Tipo=ccc");
-//		listaNombreObjetosS3e.add("ED2/Ubicacion=ED_Local");
-//		listaNombreObjetosS3e.add("ED2/Tipo=ccc");
-
-		listaNombreObjetosS3e.add("MCS/TipoDeMCS=MCS_focos");
-		listaNombreObjetosS3e.add("MCS/TipoDeMCS=MCS_ESgeneral");
-		listaNombreObjetosS3e.add("MCS/TipoDeMCS=MCS_ES_hiloDoble");
-		listaNombreObjetosS3e.add("MF/Ubicacion=MF_Local/TipoFoco=MF_noIntermApagado");
-		listaNombreObjetosS3e.add("MF/Ubicacion=MF_Local/TipoFoco=MF_noIntermEncendido");
-		listaNombreObjetosS3e.add("MF/Ubicacion=MF_Local/TipoFoco=MF_IntermApagado");
-		listaNombreObjetosS3e.add("MF/Ubicacion=MF_Local/TipoFoco=MF_InterEncFijoReposo");	
-		listaNombreObjetosS3e.add("ED/Ubicacion=ED_Local/Tipo=ED_dobleHilo");
-		listaNombreObjetosS3e.add("ED/Ubicacion=ED_Local/Tipo=ED_dobleConjugada");
-		listaNombreObjetosS3e.add("ED/Ubicacion=ED_Local/Tipo=ED_simpleHilo");
-		listaNombreObjetosS3e.add("SD/Ubicacion=SD_Local/Tipo=SD_simple");
-		listaNombreObjetosS3e.add("SD/Ubicacion=SD_Local/Tipo=SD_doble");
-	
-		listaNombreObjetosS3e.add("MA");
-		listaNombreObjetosS3e.add("MM");
-		//listaNombreObjetosS3e.add("MCS");
-		
-		listaNombreObjetosS3e.add("ED");	
-		//listaNombreObjetosS3e.add("CSE");		
-		listaNombreObjetosS3e.add("SD");
-		listaNombreObjetosS3e.add("MF");
-		listaNombreObjetosS3e.add("IF");
-		listaNombreObjetosS3e.add("IS");
-		//listaNombreObjetosS3e.add("PV");
-		listaNombreObjetosS3e.add("SE");
-		listaNombreObjetosS3e.add("CV");
-		listaNombreObjetosS3e.add("AG");
-
-		listaNombreObjetosS3e.add("MO");
-		listaNombreObjetosS3e.add("ML");
-		
-		this.numeroObjetosS3e = listaNombreObjetosS3e.size();
-		this.fichero = ficheroXML;
-		this.pathScriptsAutomaticos="";
-		this.pathSicamPCXML="";
-				
-		nombreFichero= fichero.getName();
-		
-		//localizamos el sicampc.xml		
-		pathSicamPCXML = fichero.getPath().substring(0, fichero.getPath().length() - nombreFichero.length())+"\\..\\..\\";
-		ficheroSicamPC = new File(pathSicamPCXML+"sicampc.xml");
-
-		
-				
-		// se crea una lista de numObjS3e elementos que contendra el numero de objetos de cada tipo (numeroMCS, numeroED, numeroSD, )
-		// inicialmente todos con valor 0
-		for (int i=0; i<numeroObjetosS3e; i++) 
-			this.listaNumeroObjetosS3e.add(0);
-		
-		// se crea una lista de listas que contendran los elementos repetidos de cada tipo si los hubiese:
-		// 
-		// listaNombreObjetosRepetidosEnXML(0) 		= ("MCS_001", "MCS_001") en caso de que dos MCS tengan el mismo nombre "MCS_001"
-		// listaNombreObjetosRepetidosEnXML(1) 		= ("EDVA1", "EDVA1")
-		// listaNombreObjetosRepetidosEnXML(2) 		= vacio		
-		// ...
-		// listaNombreObjetosRepetidosEnXML(numObjS3e-1) = etc
-		
-		for (int i=0; i<numeroObjetosS3e; i++) {
-			this.listaNombreObjetosRepetidosEnXML.add(new ArrayList<String>());
-			this.listaNombreObjetosEnXML.add(new ArrayList<String>());
-			this.listaIdentificadorObjetosEnXML.add(new ArrayList<String>());
-			this.listaIdentificadorUsadosObjetosEnXML.add(new ArrayList<Boolean>());
-			this.listaIdentificadorObjetos_noUsadosEnXML.add(new ArrayList<String>());			
-		}		
-		parseaXMLS3e();
-		if (ficheroSicamPC.exists()) {
-			parsea_SicamPcXML();
-			if (pathScriptsAutomaticos!=null) {
-				fileScriptsAutomaticos = new File(pathScriptsAutomaticos);
-			} else { 
-				System.out.println("No hay pathScriptsAutomaticos en sicampc.xml");
-			}
-		} else {
-			//System.out.println("No existe sicampc.xml");
-			ficheroSicamPC=null;
-		}		
-				
-		// Se buscan los objetos que estan en las MCS para ver su grado de ocupacion
-		for (int i=0; i<listaNombreObjetosS3e_inMCS.size(); i++) {
-		
-		}		
-	}
-	
 	public void parseaXMLS3e () {
 		try {
 			SAXParserFactory factory2 = SAXParserFactory.newInstance();
@@ -202,19 +183,19 @@ public class DatosFicheroXML {
 				public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 					String etiqueta = qName;
 					// buscamos el startElement en nuestra lista de objetos a evaluar
-					for (int startE=0; startE<numeroObjetosS3e; startE ++) {
+					for (int startE=0; startE<num_Obj_S3e; startE ++) {
 						
 						boolean elementoSimple_analizado = false;
 						//para recoger los de tipo "ED", "SD", "MO", ....
-						if (etiqueta.equalsIgnoreCase(listaNombreObjetosS3e.get(startE))) {						
-							listaNombreObjetosEnXML.get(startE).add(attributes.getValue("Nombre"));
-							listaIdentificadorObjetosEnXML.get(startE).add(attributes.getValue("Identificador"));		
+						if (etiqueta.equalsIgnoreCase(lista_Obj_S3e_NOMBRE.get(startE))) {						
+							obj_XML_NOMBRE.get(startE).add(attributes.getValue("Nombre"));
+							obj_XML_Id.get(startE).add(attributes.getValue("Identificador"));		
 							elementoSimple_analizado = true;
 						}
 						
 						if (true) {
 							List<String> xxxx = new ArrayList<String>();
-							xxxx		= utilidades.analizaObjArgs(listaNombreObjetosS3e.get(startE));
+							xxxx		= utilidades.analizaObjArgs(lista_Obj_S3e_NOMBRE.get(startE));
 							int nro_argumentos = (xxxx.size()-1)/2;
 							
 							xxxx.get(0);
@@ -231,8 +212,8 @@ public class DatosFicheroXML {
 								}
 								
 								if (cumpleCriterio) {
-									listaNombreObjetosEnXML.get(startE).add(attributes.getValue("Nombre"));
-									listaIdentificadorObjetosEnXML.get(startE).add(attributes.getValue("Identificador"));
+									obj_XML_NOMBRE.get(startE).add(attributes.getValue("Nombre"));
+									obj_XML_Id.get(startE).add(attributes.getValue("Identificador"));
 									//System.out.println(xxxx+ ": "+attributes.getValue("Nombre")+", " );
 								}
 							}
@@ -280,9 +261,9 @@ public class DatosFicheroXML {
 	}
 	
 	public void cuentaObjetosS3e () {
-		for (int i=0; i<listaNumeroObjetosS3e.size(); i++) 
+		for (int i=0; i<lista_Obj_S3e_CANTIDAD.size(); i++) 
 		{
-			this.listaNumeroObjetosS3e.set(i,listaNombreObjetosEnXML.get(i).size());
+			this.lista_Obj_S3e_CANTIDAD.set(i,obj_XML_NOMBRE.get(i).size());
 		}
 	}
 	
@@ -290,15 +271,15 @@ public class DatosFicheroXML {
 		boolean existeRepetido = false;
 		boolean primerRepetido = true;
 		String texto2print ="";
-		for (int aa=0; aa<numeroObjetosS3e;aa++) {					
-			if (listaNombreObjetosRepetidosEnXML.get(aa).size() > 0) {
+		for (int aa=0; aa<num_Obj_S3e;aa++) {					
+			if (obj_XML_NOMBRE_Repetidos.get(aa).size() > 0) {
 				if (primerRepetido) {
 					texto2print+="ERROR: Existen nombres repetidos en este fichero: \n";
 					primerRepetido = false;
 				}
-				texto2print += listaNombreObjetosS3e.get(aa) + ": " ;
-				for (int j=0; j<listaNombreObjetosRepetidosEnXML.get(aa).size() ; j++) {
-					texto2print += listaNombreObjetosRepetidosEnXML.get(aa).get(j) + "\t";				
+				texto2print += lista_Obj_S3e_NOMBRE.get(aa) + ": " ;
+				for (int j=0; j<obj_XML_NOMBRE_Repetidos.get(aa).size() ; j++) {
+					texto2print += obj_XML_NOMBRE_Repetidos.get(aa).get(j) + "\t";				
 					existeRepetido = true;
 				}
 			}					
@@ -311,13 +292,11 @@ public class DatosFicheroXML {
 	
 	public String imprimelistaNumeroObjetosS3e () {
 		String texto2print ="";
-		for (int aa=0; aa<numeroObjetosS3e;aa++) {						
-			texto2print+=listaNombreObjetosS3e.get(aa) + ": " + listaNumeroObjetosS3e.get(aa) + "\n";
+		for (int aa=0; aa<num_Obj_S3e;aa++) {						
+			texto2print+=lista_Obj_S3e_NOMBRE.get(aa) + ": " + lista_Obj_S3e_CANTIDAD.get(aa) + "\n";
 		}
 		return texto2print;
 	}	
-	
-
 	
 	public String imprimeMCS_Estimados () {
 		String texto2print ="";
@@ -341,15 +320,13 @@ public class DatosFicheroXML {
 				(n_estimados_MCSQ4_AF +n_estimados_MCSQ4_AES);
 		return texto2print;
 	}
-
 	
 	public String imprimeIdentificadorObjetoNoUsados (String tipoObjetoS3e) {
 		int inTipoObjetoS3e = devuelveIndiceObjetoS3e(tipoObjetoS3e);
 		String texto2print ="";
 		
 		if (this.listaIdentificadorObjetos_noUsadosEnXML.get(inTipoObjetoS3e).size()>0) {
-			texto2print+=tipoObjetoS3e+": ";
-			
+			texto2print+=tipoObjetoS3e+": ";			
 			for (int aa=0; aa<this.listaIdentificadorObjetos_noUsadosEnXML.get(inTipoObjetoS3e).size();aa++) {						
 				texto2print+=this.listaIdentificadorObjetos_noUsadosEnXML.get(inTipoObjetoS3e).get(aa) + ", ";
 			}
@@ -360,75 +337,72 @@ public class DatosFicheroXML {
 	
 	public void calculaNombreObjetosRepetidosS3e () {
 		List<String> listaDevueltaConRepetidos = new ArrayList<String>();
-		for (int i=0; i<numeroObjetosS3e; i++) 
+		for (int i=0; i<num_Obj_S3e; i++) 
 		{
 			// se llama a una función que devuelve una lista de objetos repetidos de la lista pasada como argumento			
-			listaDevueltaConRepetidos = Listas.devuelveListaRepetidos((ArrayList<String>) listaNombreObjetosEnXML.get(i));
+			listaDevueltaConRepetidos = Listas.devuelveListaRepetidos((ArrayList<String>) obj_XML_NOMBRE.get(i));
 			
 			//paso la lista devuelta a listaNombreObjetosRepetidosEnXML(i)
 			for (int j=0;j<listaDevueltaConRepetidos.size();j++) {
-				listaNombreObjetosRepetidosEnXML.get(i).add(listaDevueltaConRepetidos.get(j));
+				obj_XML_NOMBRE_Repetidos.get(i).add(listaDevueltaConRepetidos.get(j));
 			}			
 		}
 	}
 	
-	public void calculaIdentificadorObjetosNoUsadosS3e () {
-//		for (int i=0;i<numeroObjetosS3e;i++) {
-//			this.calculaIdentificadorObjetoNoUsados(listaNombreObjetosS3e.get(i));
-//		}
-		
-		this.calculaIdentificadorObjetoNoUsados("MCS");
-		this.calculaIdentificadorObjetoNoUsados("CV");
-		this.calculaIdentificadorObjetoNoUsados("ED");
-		this.calculaIdentificadorObjetoNoUsados("SD");
-		this.calculaIdentificadorObjetoNoUsados("AG");
-		this.calculaIdentificadorObjetoNoUsados("MA");		
-		this.calculaIdentificadorObjetoNoUsados("MF");		
+	public void calcula_Id_Objetos_UsadosS3e () {
+		for (int i=0;i<num_Obj_S3e;i++) {
+			this.calcula_Id_Objetos_Usados_porTipo(lista_Obj_S3e_NOMBRE.get(i));
+		}		
 	}
 	
-	public String imprimeIdentificadorObjetosNoUsadosS3e () {
-		String texto2print ="";
-		texto2print+=this.imprimeIdentificadorObjetoNoUsados("MCS");
-		texto2print+=this.imprimeIdentificadorObjetoNoUsados("CV");
-		texto2print+=this.imprimeIdentificadorObjetoNoUsados("ED");
-		texto2print+=this.imprimeIdentificadorObjetoNoUsados("SD");
-		texto2print+=this.imprimeIdentificadorObjetoNoUsados("AG");
-		texto2print+=this.imprimeIdentificadorObjetoNoUsados("MA");		
-		texto2print+=this.imprimeIdentificadorObjetoNoUsados("MF");		
+	public String imprime_Id_No_UsadosS3e () {
+		String texto2print ="";		
+		for (int i=0;i<num_Obj_S3e;i++) {
+			texto2print+=this.imprimeIdentificadorObjetoNoUsados(lista_Obj_S3e_NOMBRE.get(i));
+		}	
 		return texto2print;
 	}
 	
-	
-	public void calculaIdentificadorObjetoNoUsados (String tipoObjetoS3e) {
+	public void calcula_Id_Objetos_Usados_porTipo (String tipoObjetoS3e) {
 		int inTipoObjetoS3e = devuelveIndiceObjetoS3e(tipoObjetoS3e);		
 		try {
-			//iteramos para cada MCS o ED,  .... configurada (20500, 20501, 20502, ...)
-			for (int inObjeto = 0; inObjeto<this.listaIdentificadorObjetosEnXML.get(inTipoObjetoS3e).size(); inObjeto++) {				
-				int apariciones = 0;
-				Scanner sc = new Scanner(this.fichero);
-				String linea = "";
-				
-				this.listaIdentificadorUsadosObjetosEnXML.get(inTipoObjetoS3e).add(false);
-				while (sc.hasNext()) {
-					linea = sc.nextLine();
-					if (linea.contains(this.listaIdentificadorObjetosEnXML.get(inTipoObjetoS3e).get(inObjeto))) {
-						apariciones++;
-						if (apariciones > 1) {
-							this.listaIdentificadorUsadosObjetosEnXML.get(inTipoObjetoS3e).set(inObjeto, true);
-							break;
-						}						
+			for (int inObjeto = 0; inObjeto<this.obj_XML_Id.get(inTipoObjetoS3e).size(); inObjeto++) {	
+				//primero los que se excluyen en este calculo por reducir tiempo de calculo
+				if (tipoObjetoS3e.contentEquals("MO") ||
+						tipoObjetoS3e.contentEquals("ED") ||
+						tipoObjetoS3e.contentEquals("SD") ||
+						tipoObjetoS3e.contentEquals("MF") ||
+						tipoObjetoS3e.contentEquals("MCS") ) {
+					this.obj_XML_Usados.get(inTipoObjetoS3e).add(0);
+					this.obj_XML_Usados.get(inTipoObjetoS3e).set(inObjeto, -1); // no aplica
+				} else {
+					int apariciones = 0;
+					Scanner sc = new Scanner(this.fichero);
+					String linea = "";
+					
+					this.obj_XML_Usados.get(inTipoObjetoS3e).add(0);
+					while (sc.hasNext()) {
+						linea = sc.nextLine();
+						if (linea.contains(this.obj_XML_Id.get(inTipoObjetoS3e).get(inObjeto))) {
+							apariciones++;
+							if (apariciones > 1) {
+								this.obj_XML_Usados.get(inTipoObjetoS3e).set(inObjeto, 1);
+								break;
+							}						
+						}
 					}
-				}
-				sc.close();		
+					sc.close();						
+				}	
 			}
 				
 		} catch (IOException e) {			
 			e.printStackTrace();
 		}
 
-		for (int inObjeto = 0; inObjeto<this.listaIdentificadorUsadosObjetosEnXML.get(inTipoObjetoS3e).size(); inObjeto++) {
-			if (!this.listaIdentificadorUsadosObjetosEnXML.get(inTipoObjetoS3e).get(inObjeto)) {
-				listaIdentificadorObjetos_noUsadosEnXML.get(inTipoObjetoS3e).add(this.listaIdentificadorObjetosEnXML.get(inTipoObjetoS3e).get(inObjeto));				
+		for (int inObjeto = 0; inObjeto<this.obj_XML_Usados.get(inTipoObjetoS3e).size(); inObjeto++) {
+			if (this.obj_XML_Usados.get(inTipoObjetoS3e).get(inObjeto)==0) {
+				listaIdentificadorObjetos_noUsadosEnXML.get(inTipoObjetoS3e)
+					.add(this.obj_XML_Id.get(inTipoObjetoS3e).get(inObjeto));				
 			}
 		}
 	}
@@ -439,10 +413,6 @@ public class DatosFicheroXML {
 			int apariciones = 0;
 			Scanner sc = new Scanner(fileScript);
 			String linea = "";
-			
-			
-			//System.out.println("Analizamos: "+ stringBuscar + "\t"+  fileScript);
-			//this.listaIdentificadorUsadosObjetosEnXML.get(inTipoObjetoS3e).add(false);
 			while (sc.hasNext()) {
 				linea = sc.nextLine();
 				if (    
@@ -474,137 +444,132 @@ public class DatosFicheroXML {
 		return  imprimeError;
 	}
 	
-	
 	public void estimaMCS() {
 		String objeto; 		
 		objeto = "MF/Ubicacion=MF_Local/TipoFoco=MF_noIntermApagado";
-		if(listaNombreObjetosS3e.contains(objeto))
+		if(lista_Obj_S3e_NOMBRE.contains(objeto))
 		{
 			int posicion;
-			posicion = Listas.buscaEnLista(listaNombreObjetosS3e, objeto);			
-			n_estimados_MCS_FNR += listaNumeroObjetosS3e.get(posicion)/4; 
-			n_estimados_MCSQ4_AF += listaNumeroObjetosS3e.get(posicion)/8;			
+			posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
+			n_estimados_MCS_FNR += lista_Obj_S3e_CANTIDAD.get(posicion)/4; 
+			n_estimados_MCSQ4_AF += lista_Obj_S3e_CANTIDAD.get(posicion)/8;			
 		} else {
-			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
+			System.out.println("ERROR: para estimar MCS, debe tenerse en cuenta " +  objeto );
 		}
 				
 		objeto = "MF/Ubicacion=MF_Local/TipoFoco=MF_noIntermEncendido";
-		if(listaNombreObjetosS3e.contains(objeto))
+		if(lista_Obj_S3e_NOMBRE.contains(objeto))
 		{
 			int posicion;
-			posicion = Listas.buscaEnLista(listaNombreObjetosS3e, objeto);			
-			n_estimados_MCS_FR += listaNumeroObjetosS3e.get(posicion)/4;
-			n_estimados_MCSQ4_AF += listaNumeroObjetosS3e.get(posicion)/8;			
+			posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
+			n_estimados_MCS_FR += lista_Obj_S3e_CANTIDAD.get(posicion)/4;
+			n_estimados_MCSQ4_AF += lista_Obj_S3e_CANTIDAD.get(posicion)/8;			
 		} else {
 			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
 		}
 		
 		objeto = "MF/Ubicacion=MF_Local/TipoFoco=MF_IntermApagado";
-		if(listaNombreObjetosS3e.contains(objeto))
+		if(lista_Obj_S3e_NOMBRE.contains(objeto))
 		{
 			int posicion;
-			posicion = Listas.buscaEnLista(listaNombreObjetosS3e, objeto);		
-			n_estimados_MCS_FNRI += listaNumeroObjetosS3e.get(posicion)/2;
-			n_estimados_MCSQ4_AF += listaNumeroObjetosS3e.get(posicion)/8;			
+			posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);		
+			n_estimados_MCS_FNRI += lista_Obj_S3e_CANTIDAD.get(posicion)/2;
+			n_estimados_MCSQ4_AF += lista_Obj_S3e_CANTIDAD.get(posicion)/8;			
 		} else {
 			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
 		}
 		objeto = "MF/Ubicacion=MF_Local/TipoFoco=MF_InterEncFijoReposo";
-		if(listaNombreObjetosS3e.contains(objeto))
+		if(lista_Obj_S3e_NOMBRE.contains(objeto))
 		{
 			int posicion;
-			posicion = Listas.buscaEnLista(listaNombreObjetosS3e, objeto);			
-			n_estimados_MCS_FRI += listaNumeroObjetosS3e.get(posicion)/2;
-			n_estimados_MCSQ4_AF += listaNumeroObjetosS3e.get(posicion)/8;	
+			posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
+			n_estimados_MCS_FRI += lista_Obj_S3e_CANTIDAD.get(posicion)/2;
+			n_estimados_MCSQ4_AF += lista_Obj_S3e_CANTIDAD.get(posicion)/8;	
 		} else {
 			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
 		}
 		
 		objeto = "ED/Ubicacion=ED_Local/Tipo=ED_dobleHilo";
-		if(listaNombreObjetosS3e.contains(objeto))
+		if(lista_Obj_S3e_NOMBRE.contains(objeto))
 		{
 			int posicion;
-			posicion = Listas.buscaEnLista(listaNombreObjetosS3e, objeto);			
-			n_estimados_MCS_ESHD += listaNumeroObjetosS3e.get(posicion)/8;
-			n_estimados_MCSQ4_AES += listaNumeroObjetosS3e.get(posicion)/40;			
+			posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
+			n_estimados_MCS_ESHD += lista_Obj_S3e_CANTIDAD.get(posicion)/8;
+			n_estimados_MCSQ4_AES += lista_Obj_S3e_CANTIDAD.get(posicion)/40;			
 		} else {
 			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
 		}
 		
 		objeto = "ED/Ubicacion=ED_Local/Tipo=ED_dobleConjugada";
-		if(listaNombreObjetosS3e.contains(objeto))
+		if(lista_Obj_S3e_NOMBRE.contains(objeto))
 		{
 			int posicion;
-			posicion = Listas.buscaEnLista(listaNombreObjetosS3e, objeto);			
-			n_estimados_MCS_ES += listaNumeroObjetosS3e.get(posicion)/8; 
-			n_estimados_MCSQ4_AES += listaNumeroObjetosS3e.get(posicion)/20;   // no estoy seguro
+			posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
+			n_estimados_MCS_ES += lista_Obj_S3e_CANTIDAD.get(posicion)/8; 
+			n_estimados_MCSQ4_AES += lista_Obj_S3e_CANTIDAD.get(posicion)/20;   // no estoy seguro
 		} else {
 			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
 		}
 		
 		objeto = "ED/Ubicacion=ED_Local/Tipo=ED_simpleHilo";
-		if(listaNombreObjetosS3e.contains(objeto))
+		if(lista_Obj_S3e_NOMBRE.contains(objeto))
 		{
 			int posicion;
-			posicion = Listas.buscaEnLista(listaNombreObjetosS3e, objeto);			
-			n_estimados_MCS_ES += listaNumeroObjetosS3e.get(posicion)/16; 
-			n_estimados_MCSQ4_AES += listaNumeroObjetosS3e.get(posicion)/40;   // no estoy seguro
+			posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
+			n_estimados_MCS_ES += lista_Obj_S3e_CANTIDAD.get(posicion)/16; 
+			n_estimados_MCSQ4_AES += lista_Obj_S3e_CANTIDAD.get(posicion)/40;   // no estoy seguro
 		} else {
 			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
 		}
 		
 		objeto = "MA";
-		if(listaNombreObjetosS3e.contains(objeto))
+		if(lista_Obj_S3e_NOMBRE.contains(objeto))
 		{
 			int posicion;
-			posicion = Listas.buscaEnLista(listaNombreObjetosS3e, objeto);			
-			n_estimados_MCS_ES += listaNumeroObjetosS3e.get(posicion)/2 + 1/8; //1/8 por el final de carrera
-			n_estimados_MCS_SD += listaNumeroObjetosS3e.get(posicion)/2 + 1/8;  
-			n_estimados_MCSQ4_AES += listaNumeroObjetosS3e.get(posicion)/4;   // no estoy seguro
+			posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
+			n_estimados_MCS_ES += lista_Obj_S3e_CANTIDAD.get(posicion)/2 + 1/8; //1/8 por el final de carrera
+			n_estimados_MCS_SD += lista_Obj_S3e_CANTIDAD.get(posicion)/2 + 1/8;  
+			n_estimados_MCSQ4_AES += lista_Obj_S3e_CANTIDAD.get(posicion)/4;   // no estoy seguro
 		} else {
 			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
 		}
 		
 		objeto = "MM";
-		if(listaNombreObjetosS3e.contains(objeto))
+		if(lista_Obj_S3e_NOMBRE.contains(objeto))
 		{
 			int posicion;
-			posicion = Listas.buscaEnLista(listaNombreObjetosS3e, objeto);			
-			n_estimados_MCS_ESHD += listaNumeroObjetosS3e.get(posicion)/2 ; 
-			n_estimados_MCSQ4_AES += listaNumeroObjetosS3e.get(posicion)/4;
+			posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
+			n_estimados_MCS_ESHD += lista_Obj_S3e_CANTIDAD.get(posicion)/2 ; 
+			n_estimados_MCSQ4_AES += lista_Obj_S3e_CANTIDAD.get(posicion)/4;
 		} else {
 			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
 		}
 		
 		objeto = "SD/Ubicacion=SD_Local/Tipo=SD_simple";
-		if(listaNombreObjetosS3e.contains(objeto))
+		if(lista_Obj_S3e_NOMBRE.contains(objeto))
 		{
 			int posicion;
-			posicion = Listas.buscaEnLista(listaNombreObjetosS3e, objeto);			
-			n_estimados_MCS_SD += listaNumeroObjetosS3e.get(posicion)/4 ; 
-			n_estimados_MCSQ4_AES += listaNumeroObjetosS3e.get(posicion)/8;
+			posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
+			n_estimados_MCS_SD += lista_Obj_S3e_CANTIDAD.get(posicion)/4 ; 
+			n_estimados_MCSQ4_AES += lista_Obj_S3e_CANTIDAD.get(posicion)/8;
 		} else {
 			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
 		}
 		objeto = "SD/Ubicacion=SD_Local/Tipo=SD_doble";
-		if(listaNombreObjetosS3e.contains(objeto))
+		if(lista_Obj_S3e_NOMBRE.contains(objeto))
 		{
 			int posicion;
-			posicion = Listas.buscaEnLista(listaNombreObjetosS3e, objeto);			
-			n_estimados_MCS_SD += listaNumeroObjetosS3e.get(posicion)/2 ; 
-			n_estimados_MCSQ4_AES += listaNumeroObjetosS3e.get(posicion)/8;
+			posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
+			n_estimados_MCS_SD += lista_Obj_S3e_CANTIDAD.get(posicion)/2 ; 
+			n_estimados_MCSQ4_AES += lista_Obj_S3e_CANTIDAD.get(posicion)/8;
 		} else {
 			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
-		}
-		
-		
-	
+		}		
 	}
 	
-	
 	private int devuelveIndiceObjetoS3e(String nombreObjetoS3e) {
-		for (int i = 0; i<numeroObjetosS3e; i++) {
-			if (listaNombreObjetosS3e.get(i).equals(nombreObjetoS3e)) return i;			
+		for (int i = 0; i<num_Obj_S3e; i++) {
+			if (lista_Obj_S3e_NOMBRE.get(i).equals(nombreObjetoS3e)) return i;			
 		}		
 		return -1;
 	}
@@ -613,33 +578,28 @@ public class DatosFicheroXML {
 	private String nombreFichero;
 	private String pathScriptsAutomaticos;
 	private String pathSicamPCXML;
-	private List<MCS> MCSs = new ArrayList<MCS>();
-	private List<String> listaNombreObjetosS3e = new ArrayList<String>();
-	private List<Integer> listaNumeroObjetosS3e = new ArrayList<Integer>();
-	private List<List<String>> listaNombreObjetosRepetidosEnXML = new ArrayList<List<String>>();
-	private List<List<String>> listaNombreObjetosEnXML = new ArrayList<List<String>>();
-	private List<List<String>> listaIdentificadorObjetosEnXML = new ArrayList<List<String>>();
+	private int num_Obj_S3e;		
+	private List<String> lista_Obj_S3e_NOMBRE = new ArrayList<String>();
+	private List<Integer> lista_Obj_S3e_CANTIDAD = new ArrayList<Integer>();
+	
+	private List<List<String>> obj_XML_NOMBRE = new ArrayList<List<String>>();
+	private List<List<String>> obj_XML_Id = new ArrayList<List<String>>();	
+	private List<List<String>> obj_XML_NOMBRE_Repetidos = new ArrayList<List<String>>();
+	private List<List<Integer>> obj_XML_Usados = new ArrayList<List<Integer>>();
+	
 	private List<List<String>> listaIdentificadorObjetos_noUsadosEnXML = new ArrayList<List<String>>();
-	
-	private List<String> listaNombreObjetosS3e_inMCS = new ArrayList<String>(); //lista de objetos que se van a ir identificando e incrustando en las MCS para contar lo llenas q estan
-	
-	private List<List<Boolean>> listaIdentificadorUsadosObjetosEnXML = new ArrayList<List<Boolean>>();
+
 	private File fichero = new File("");
 	private File ficheroSicamPC = new File("");
-
+	private File fileScriptsAutomaticos;
+	
 	private float n_estimados_MCS_FR = 0;
 	private float n_estimados_MCS_FNR = 0;
 	private float n_estimados_MCS_FRI = 0;
 	private float n_estimados_MCS_FNRI = 0;
 	private float n_estimados_MCS_ES = 0;
 	private float n_estimados_MCS_ESHD = 0;	
-	private float n_estimados_MCS_SD = 0;
-	
+	private float n_estimados_MCS_SD = 0;	
 	private float n_estimados_MCSQ4_AES = 0;
 	private float n_estimados_MCSQ4_AF = 0;
-
-	
-	private File fileScriptsAutomaticos;
-	private int numeroObjetosS3e;		
-
 }
