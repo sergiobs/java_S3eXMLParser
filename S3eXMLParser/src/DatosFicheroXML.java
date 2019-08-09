@@ -54,7 +54,24 @@ public class DatosFicheroXML {
 	public File getFicheroSicamPC() {
 		return ficheroSicamPC;
 	}
-	
+	public float getn_estimados_MCS_FR() {
+		return n_estimados_MCS_FR;
+	}
+	public float getn_estimados_MCS_FRI() {
+		return n_estimados_MCS_FRI;
+	}
+	public float getn_estimados_MCS_FNR() {
+		return n_estimados_MCS_FNR;
+	}
+	public float getn_estimados_MCS_FNRI() {
+		return n_estimados_MCS_FNRI;
+	}
+	public float getn_estimados_MCS_ES() {
+		return n_estimados_MCS_ES;
+	}
+	public float getn_estimados_MCS_ESHD() {
+		return n_estimados_MCS_ESHD;
+	}
 	
 	// setters
 	public void setFichero(File fichero) {
@@ -92,63 +109,37 @@ public class DatosFicheroXML {
 //		listaNombreObjetosS3e.add("ED2/Ubicacion=ED_Local/Tipo=ccc");
 //		listaNombreObjetosS3e.add("ED2/Ubicacion=ED_Local");
 //		listaNombreObjetosS3e.add("ED2/Tipo=ccc");
-		
+
+		listaNombreObjetosS3e.add("MCS/TipoDeMCS=MCS_focos");
+		listaNombreObjetosS3e.add("MCS/TipoDeMCS=MCS_ESgeneral");
+		listaNombreObjetosS3e.add("MCS/TipoDeMCS=MCS_ES_hiloDoble");
+		listaNombreObjetosS3e.add("MF/Ubicacion=MF_Local/TipoFoco=MF_noIntermApagado");
+		listaNombreObjetosS3e.add("MF/Ubicacion=MF_Local/TipoFoco=MF_noIntermEncendido");
+		listaNombreObjetosS3e.add("MF/Ubicacion=MF_Local/TipoFoco=MF_IntermApagado");
+		listaNombreObjetosS3e.add("MF/Ubicacion=MF_Local/TipoFoco=MF_InterEncFijoReposo");	
 		listaNombreObjetosS3e.add("ED/Ubicacion=ED_Local/Tipo=ED_dobleHilo");
 		listaNombreObjetosS3e.add("ED/Ubicacion=ED_Local/Tipo=ED_dobleConjugada");
 		listaNombreObjetosS3e.add("ED/Ubicacion=ED_Local/Tipo=ED_simpleHilo");
-		
-		listaNombreObjetosS3e.add("ED");
-		listaNombreObjetosS3e.add("MCS");
-		//listaNombreObjetosS3e.add("CSE");
-		listaNombreObjetosS3e.add("ED");
-		listaNombreObjetosS3e.add("SD");
-		listaNombreObjetosS3e.add("MF");
+		listaNombreObjetosS3e.add("SD/Ubicacion=SD_Local/Tipo=SD_simple");
+		listaNombreObjetosS3e.add("SD/Ubicacion=SD_Local/Tipo=SD_doble");
+	
 		listaNombreObjetosS3e.add("MA");
 		listaNombreObjetosS3e.add("MM");
+		//listaNombreObjetosS3e.add("MCS");
+		
+		listaNombreObjetosS3e.add("ED");	
+		//listaNombreObjetosS3e.add("CSE");		
+		listaNombreObjetosS3e.add("SD");
+		listaNombreObjetosS3e.add("MF");
 		listaNombreObjetosS3e.add("IF");
 		listaNombreObjetosS3e.add("IS");
 		//listaNombreObjetosS3e.add("PV");
 		listaNombreObjetosS3e.add("SE");
 		listaNombreObjetosS3e.add("CV");
 		listaNombreObjetosS3e.add("AG");
-		//listaNombreObjetosS3e.add("CES");
-		//listaNombreObjetosS3e.add("ALG");
-		//listaNombreObjetosS3e.add("EDNV");
-		//listaNombreObjetosS3e.add("DCO");
-		//listaNombreObjetosS3e.add("SC");
-		//listaNombreObjetosS3e.add("DAS");
-		//listaNombreObjetosS3e.add("DPT");
-		//listaNombreObjetosS3e.add("DR");
-		//listaNombreObjetosS3e.add("GSE");
-		//listaNombreObjetosS3e.add("CPM");
-		//listaNombreObjetosS3e.add("DZ");
-		//listaNombreObjetosS3e.add("PG");
-		//listaNombreObjetosS3e.add("RA");
-		//listaNombreObjetosS3e.add("TY");
-		//listaNombreObjetosS3e.add("DEM");
-		//listaNombreObjetosS3e.add("BL");
-		listaNombreObjetosS3e.add("MO");
-		//listaNombreObjetosS3e.add("ML");
-		//listaNombreObjetosS3e.add("DP");
-		//listaNombreObjetosS3e.add("IAS");
-		//listaNombreObjetosS3e.add("CSC");
-		//listaNombreObjetosS3e.add("GIM");
-		
-		listaNombreObjetosS3e.add("SD_local");
-		listaNombreObjetosS3e.add("MF_local");
-		
-		listaNombreObjetosS3e.add("MCS_focos");
-		listaNombreObjetosS3e.add("MCS_ESgeneral");
-		listaNombreObjetosS3e.add("MCS_ES_hiloDoble");
-		
-		
-		listaNombreObjetosS3e_inMCS.add("MF");
-		listaNombreObjetosS3e_inMCS.add("ED");
-		listaNombreObjetosS3e_inMCS.add("SD");
-		listaNombreObjetosS3e_inMCS.add("MA");
-		
-		
 
+		listaNombreObjetosS3e.add("MO");
+		listaNombreObjetosS3e.add("ML");
 		
 		this.numeroObjetosS3e = listaNombreObjetosS3e.size();
 		this.fichero = ficheroXML;
@@ -199,8 +190,7 @@ public class DatosFicheroXML {
 		// Se buscan los objetos que estan en las MCS para ver su grado de ocupacion
 		for (int i=0; i<listaNombreObjetosS3e_inMCS.size(); i++) {
 		
-		}
-		//parseaXMLS3e_inMCS();
+		}		
 	}
 	
 	public void parseaXMLS3e () {
@@ -245,63 +235,11 @@ public class DatosFicheroXML {
 									listaIdentificadorObjetosEnXML.get(startE).add(attributes.getValue("Identificador"));
 									//System.out.println(xxxx+ ": "+attributes.getValue("Nombre")+", " );
 								}
-								
-								
-								
 							}
-						}
-						
-//						List<String> borrame = new ArrayList<String>(); 
-//						//borrame		= utilidades.analizaObjArgs("ED/Ubicacion=ED_Local/Tipo=ED_dobleHilo");
-//						borrame		= utilidades.analizaObjArgs("ED");
-						
-						
-//						//para recoger los que tienen ubicación tipo Obj/Arg1=val1/Arg2=val2 
-//						// por ejemplo ("ED/Ubicacion=ED_Local/Tipo=ED_dobleHilo") 
-//						
-//						//para recoger los que tienen ubicación tipo "MF_Local" , ....
-//						if (listaNombreObjetosS3e.get(startE).equalsIgnoreCase(attributes.getValue("Ubicacion"))) {							
-//							listaNombreObjetosEnXML.get(startE).add(attributes.getValue("Nombre"));
-//							listaIdentificadorObjetosEnXML.get(startE).add(attributes.getValue("Identificador"));
-//						}	
-//						
-//						//para recoger los que tienen TipoDeMCS tipo "....
-//						if (listaNombreObjetosS3e.get(startE).equalsIgnoreCase(attributes.getValue("TipoDeMCS"))) {							
-//							listaNombreObjetosEnXML.get(startE).add(attributes.getValue("Nombre"));
-//							listaIdentificadorObjetosEnXML.get(startE).add(attributes.getValue("Identificador"));
-//						}							
-						
+						}											
 					}
 				}				
 			};
-			saxParser2.parse(fichero, handler);
-			
-		} catch (Exception e) {
-			System.out.println("main: " + e);
-			e.printStackTrace();
-		}
-	}
-
-	public void parseaXMLS3e_inMCS () {
-		try {
-			SAXParserFactory factory2 = SAXParserFactory.newInstance();
-			SAXParser saxParser2 = factory2.newSAXParser();
-			
-			DefaultHandler handler = new DefaultHandler() {
-				public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-					String etiqueta = qName;
-
-					for (int startE=0; startE<listaNombreObjetosS3e_inMCS.size(); startE ++) {
-						// si la cabecera leida del xml esta en mi lista de obj s3e
-						
-						if (etiqueta.equalsIgnoreCase(listaNombreObjetosS3e_inMCS.get(startE))) {
-							listaNombreObjetosEnXML.get(startE).add(attributes.getValue("Nombre"));
-							listaIdentificadorObjetosEnXML.get(startE).add(attributes.getValue("Identificador"));							
-						}
-					}
-				}				
-			};			
-			
 			saxParser2.parse(fichero, handler);
 			
 		} catch (Exception e) {
@@ -374,16 +312,33 @@ public class DatosFicheroXML {
 	public String imprimelistaNumeroObjetosS3e () {
 		String texto2print ="";
 		for (int aa=0; aa<numeroObjetosS3e;aa++) {						
-			texto2print+=listaNombreObjetosS3e.get(aa) + ": " + listaNumeroObjetosS3e.get(aa) + "\t";
+			texto2print+=listaNombreObjetosS3e.get(aa) + ": " + listaNumeroObjetosS3e.get(aa) + "\n";
 		}
 		return texto2print;
 	}	
 	
-	public String imprimelistaNumeroObjetosS3exx () {
+
+	
+	public String imprimeMCS_Estimados () {
 		String texto2print ="";
-		for (int aa=0; aa<numeroObjetosS3e;aa++) {						
-			texto2print+=listaNombreObjetosS3e.get(aa) + ": " + listaNumeroObjetosS3e.get(aa) + "\t";
-		}
+		
+		texto2print+="MCS_FR: " + n_estimados_MCS_FR +	"\n" +					
+						"MCS_FNR: " + n_estimados_MCS_FNR +"\n" +
+						"MCS_FRI: " + n_estimados_MCS_FRI +"\n" +
+						"MCS_FNRI: " + n_estimados_MCS_FNRI +"\n" +
+						"MCS_ES: " + n_estimados_MCS_ES +"\n" +
+						"MCS_ESHD: " + n_estimados_MCS_ESHD +"\n" +
+						"MCS_(SD): " + n_estimados_MCS_SD;
+		
+		
+		texto2print+="\nMCS Focos: " + (n_estimados_MCS_FR +n_estimados_MCS_FNR+ n_estimados_MCS_FRI+ n_estimados_MCS_FNRI) +	"\n" +					
+				"MCS ES(por ED): " + (n_estimados_MCS_ES +n_estimados_MCS_ESHD) +  "\n" +
+				"MCS ES(por SD): " + (n_estimados_MCS_SD );
+		texto2print+="\nMCS Total: " + 
+				(n_estimados_MCS_FR +n_estimados_MCS_FNR+ n_estimados_MCS_FRI+ n_estimados_MCS_FNRI + n_estimados_MCS_ES +n_estimados_MCS_ESHD) +  " / " + 
+				(n_estimados_MCS_FR +n_estimados_MCS_FNR+ n_estimados_MCS_FRI+ n_estimados_MCS_FNRI + n_estimados_MCS_SD);
+		texto2print+="\nMCSQ4 Total: " + 
+				(n_estimados_MCSQ4_AF +n_estimados_MCSQ4_AES);
 		return texto2print;
 	}
 
@@ -418,6 +373,10 @@ public class DatosFicheroXML {
 	}
 	
 	public void calculaIdentificadorObjetosNoUsadosS3e () {
+//		for (int i=0;i<numeroObjetosS3e;i++) {
+//			this.calculaIdentificadorObjetoNoUsados(listaNombreObjetosS3e.get(i));
+//		}
+		
 		this.calculaIdentificadorObjetoNoUsados("MCS");
 		this.calculaIdentificadorObjetoNoUsados("CV");
 		this.calculaIdentificadorObjetoNoUsados("ED");
@@ -503,7 +462,6 @@ public class DatosFicheroXML {
 					apariciones++;
 					if (apariciones > 0) {						
 						imprimeError = "ERROR: Se usa elemento repetido (" + stringBuscar + ") en script: " + fileScript;
-						//System.out.println("ERROR: Se usa en script: "+ stringBuscar + "en: " + fileScript );
 					}						
 				}
 			}
@@ -517,11 +475,136 @@ public class DatosFicheroXML {
 	}
 	
 	
+	public void estimaMCS() {
+		String objeto; 		
+		objeto = "MF/Ubicacion=MF_Local/TipoFoco=MF_noIntermApagado";
+		if(listaNombreObjetosS3e.contains(objeto))
+		{
+			int posicion;
+			posicion = Listas.buscaEnLista(listaNombreObjetosS3e, objeto);			
+			n_estimados_MCS_FNR += listaNumeroObjetosS3e.get(posicion)/4; 
+			n_estimados_MCSQ4_AF += listaNumeroObjetosS3e.get(posicion)/8;			
+		} else {
+			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
+		}
+				
+		objeto = "MF/Ubicacion=MF_Local/TipoFoco=MF_noIntermEncendido";
+		if(listaNombreObjetosS3e.contains(objeto))
+		{
+			int posicion;
+			posicion = Listas.buscaEnLista(listaNombreObjetosS3e, objeto);			
+			n_estimados_MCS_FR += listaNumeroObjetosS3e.get(posicion)/4;
+			n_estimados_MCSQ4_AF += listaNumeroObjetosS3e.get(posicion)/8;			
+		} else {
+			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
+		}
+		
+		objeto = "MF/Ubicacion=MF_Local/TipoFoco=MF_IntermApagado";
+		if(listaNombreObjetosS3e.contains(objeto))
+		{
+			int posicion;
+			posicion = Listas.buscaEnLista(listaNombreObjetosS3e, objeto);		
+			n_estimados_MCS_FNRI += listaNumeroObjetosS3e.get(posicion)/2;
+			n_estimados_MCSQ4_AF += listaNumeroObjetosS3e.get(posicion)/8;			
+		} else {
+			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
+		}
+		objeto = "MF/Ubicacion=MF_Local/TipoFoco=MF_InterEncFijoReposo";
+		if(listaNombreObjetosS3e.contains(objeto))
+		{
+			int posicion;
+			posicion = Listas.buscaEnLista(listaNombreObjetosS3e, objeto);			
+			n_estimados_MCS_FRI += listaNumeroObjetosS3e.get(posicion)/2;
+			n_estimados_MCSQ4_AF += listaNumeroObjetosS3e.get(posicion)/8;	
+		} else {
+			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
+		}
+		
+		objeto = "ED/Ubicacion=ED_Local/Tipo=ED_dobleHilo";
+		if(listaNombreObjetosS3e.contains(objeto))
+		{
+			int posicion;
+			posicion = Listas.buscaEnLista(listaNombreObjetosS3e, objeto);			
+			n_estimados_MCS_ESHD += listaNumeroObjetosS3e.get(posicion)/8;
+			n_estimados_MCSQ4_AES += listaNumeroObjetosS3e.get(posicion)/40;			
+		} else {
+			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
+		}
+		
+		objeto = "ED/Ubicacion=ED_Local/Tipo=ED_dobleConjugada";
+		if(listaNombreObjetosS3e.contains(objeto))
+		{
+			int posicion;
+			posicion = Listas.buscaEnLista(listaNombreObjetosS3e, objeto);			
+			n_estimados_MCS_ES += listaNumeroObjetosS3e.get(posicion)/8; 
+			n_estimados_MCSQ4_AES += listaNumeroObjetosS3e.get(posicion)/20;   // no estoy seguro
+		} else {
+			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
+		}
+		
+		objeto = "ED/Ubicacion=ED_Local/Tipo=ED_simpleHilo";
+		if(listaNombreObjetosS3e.contains(objeto))
+		{
+			int posicion;
+			posicion = Listas.buscaEnLista(listaNombreObjetosS3e, objeto);			
+			n_estimados_MCS_ES += listaNumeroObjetosS3e.get(posicion)/16; 
+			n_estimados_MCSQ4_AES += listaNumeroObjetosS3e.get(posicion)/40;   // no estoy seguro
+		} else {
+			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
+		}
+		
+		objeto = "MA";
+		if(listaNombreObjetosS3e.contains(objeto))
+		{
+			int posicion;
+			posicion = Listas.buscaEnLista(listaNombreObjetosS3e, objeto);			
+			n_estimados_MCS_ES += listaNumeroObjetosS3e.get(posicion)/2 + 1/8; //1/8 por el final de carrera
+			n_estimados_MCS_SD += listaNumeroObjetosS3e.get(posicion)/2 + 1/8;  
+			n_estimados_MCSQ4_AES += listaNumeroObjetosS3e.get(posicion)/4;   // no estoy seguro
+		} else {
+			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
+		}
+		
+		objeto = "MM";
+		if(listaNombreObjetosS3e.contains(objeto))
+		{
+			int posicion;
+			posicion = Listas.buscaEnLista(listaNombreObjetosS3e, objeto);			
+			n_estimados_MCS_ESHD += listaNumeroObjetosS3e.get(posicion)/2 ; 
+			n_estimados_MCSQ4_AES += listaNumeroObjetosS3e.get(posicion)/4;
+		} else {
+			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
+		}
+		
+		objeto = "SD/Ubicacion=SD_Local/Tipo=SD_simple";
+		if(listaNombreObjetosS3e.contains(objeto))
+		{
+			int posicion;
+			posicion = Listas.buscaEnLista(listaNombreObjetosS3e, objeto);			
+			n_estimados_MCS_SD += listaNumeroObjetosS3e.get(posicion)/4 ; 
+			n_estimados_MCSQ4_AES += listaNumeroObjetosS3e.get(posicion)/8;
+		} else {
+			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
+		}
+		objeto = "SD/Ubicacion=SD_Local/Tipo=SD_doble";
+		if(listaNombreObjetosS3e.contains(objeto))
+		{
+			int posicion;
+			posicion = Listas.buscaEnLista(listaNombreObjetosS3e, objeto);			
+			n_estimados_MCS_SD += listaNumeroObjetosS3e.get(posicion)/2 ; 
+			n_estimados_MCSQ4_AES += listaNumeroObjetosS3e.get(posicion)/8;
+		} else {
+			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
+		}
+		
+		
+	
+	}
+	
+	
 	private int devuelveIndiceObjetoS3e(String nombreObjetoS3e) {
 		for (int i = 0; i<numeroObjetosS3e; i++) {
-			if (listaNombreObjetosS3e.get(i).equals(nombreObjetoS3e)) {
-				return i;				
-			}
+			if (listaNombreObjetosS3e.get(i).equals(nombreObjetoS3e)) return i;			
 		}		
 		return -1;
 	}
@@ -544,7 +627,18 @@ public class DatosFicheroXML {
 	private File fichero = new File("");
 	private File ficheroSicamPC = new File("");
 
+	private float n_estimados_MCS_FR = 0;
+	private float n_estimados_MCS_FNR = 0;
+	private float n_estimados_MCS_FRI = 0;
+	private float n_estimados_MCS_FNRI = 0;
+	private float n_estimados_MCS_ES = 0;
+	private float n_estimados_MCS_ESHD = 0;	
+	private float n_estimados_MCS_SD = 0;
+	
+	private float n_estimados_MCSQ4_AES = 0;
+	private float n_estimados_MCSQ4_AF = 0;
 
+	
 	private File fileScriptsAutomaticos;
 	private int numeroObjetosS3e;		
 

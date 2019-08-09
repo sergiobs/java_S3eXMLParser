@@ -17,12 +17,12 @@ import java.sql.Timestamp;
 //				019.04 	* se tiene en cuenta que puede no haber fichero sicamPC.xml
 //                      * Se habilita lectura de argumento de entrada para indicar ruta
 //020 		* Lee tipos de objeto de S3e que cumplan criterios de varios arguemntos/valores
+//			* Calcula numero MCSs teoricos en S3e y Q4
 
 public class main {
-	//static int indiceFichero=0;
-	static String texto="";	
-
+	
 	public static void main(String argv[])   {		
+		String texto="";
 		String entradaTeclado = "";
 		Scanner entradaEscaner = new Scanner (System.in);
 		boolean calculaNombreObjetosRepetidosEnXML = false;
@@ -30,28 +30,36 @@ public class main {
 		boolean calculaNombreObjetosRepetidosEnXML_usados_en_Scripts = false;
 		
 		// indicamos la ruta donde vamos a buscar los xml o bien la recogemos de argumento 1
-		String rutaBase = "C:\\temp5";
-		//static String rutaBase = "C:\\CAFs_SBS\\ENCE\\ramas\\ENCE_DESARROLLO\\SIST\\Validación\\Entorno\\";	
+		//String rutaBase = "C:\\temp5";
+		String rutaBase = "C:\\CAFs_SBS\\ENCE\\ramas\\ENCE_DESARROLLO\\SIST\\Validación\\Entorno\\";	
 		
 		if (argv.length> 0) {
 			rutaBase = argv[0];
 		}
 		File ruta = new File(rutaBase);
-
-		List<File> listaFicherosXML = new ArrayList<File>();
-		List<File> listaFicherosXML_validos = new ArrayList<File>();
-		listaFicherosXML = Archivos.listarArchivosXMLRecursivamente(ruta);		
+		
+			
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 		String ficheroSalidaNombre="";
 		ficheroSalidaNombre =timestamp+"";
 		ficheroSalidaNombre=ficheroSalidaNombre.replace(":", "-");		
-		System.out.println(ficheroSalidaNombre);
 		
-		File ficheroSalida = new File(ruta.getAbsolutePath() + "\\analisisXML_"+ficheroSalidaNombre+".txt");
-		
+		File ficheroSalida = new File(ruta.getAbsolutePath() + "\\analisisXML_"+ficheroSalidaNombre+".txt");		
 		if (ficheroSalida.exists()) {
 			ficheroSalida.delete();
 		}
+
+		List<File> listaFicherosXML = new ArrayList<File>();
+		List<File> listaFicherosXML_validos = new ArrayList<File>();
+		
+ 		texto = "Buscando ficheros en " + rutaBase;
+		System.out.println(texto);
+		escribeResultados.escribe(texto+"\n", ficheroSalida);
+		
+		listaFicherosXML = Archivos.listarArchivosXMLRecursivamente(ruta);	
+
+
+	
 		
 		texto = "1. ¿Calculamos elementos con Nombre repetidos en XML (s/n)?: ";
 		System.out.print(texto);
@@ -131,14 +139,21 @@ public class main {
 			}
 				    	    	
 	    	// llamamos a la funcion para que cuente los obejtos del S3e del fichero 0
-			datosFicheroXML.cuentaObjetosS3e();					
+			datosFicheroXML.cuentaObjetosS3e();		
+			
 			
 			// sacamos lista de numero de cada objeto del S3e. (60 MCS, 100 ED, etc)
 			texto="*** Numero de objetos:\n" + datosFicheroXML.imprimelistaNumeroObjetosS3e();
 			System.out.println(texto);
 			escribeResultados.escribe(texto+"\n", ficheroSalida);	
-		//	System.out.println("");
-		//	escribeResultados.escribe("\n", ficheroSalida);	
+
+			// Estimamos MCS
+			datosFicheroXML.estimaMCS();
+			// Imprime Estimamos MCS
+			texto="*** Estimacion MCS:\n" + datosFicheroXML.imprimeMCS_Estimados();
+			System.out.println(texto);
+			escribeResultados.escribe(texto+"\n", ficheroSalida);
+			
 			
 			if (calculaNombreObjetosRepetidosEnXML) {
 				// llamamos a la funcion para que cuente los objetos del S3e del fichero 
@@ -154,7 +169,6 @@ public class main {
 				escribeResultados.escribe(texto+"\n", ficheroSalida);
 			}
 				
-			
 			if (calculaIdentificadorObjetos_noUsadosEnXML) {
 				texto="*** Elementos no usados:";
 				System.out.println(texto);
@@ -220,7 +234,12 @@ public class main {
 			    	texto = "INFO: No se usan elementos repes en scripts.";
 			    	System.out.println(texto);
 					escribeResultados.escribe(texto+"\n", ficheroSalida);
-			    }		    
+			    }	
+			    if (usadoElemRepes>0&&calculaNombreObjetosRepetidosEnXML_usados_en_Scripts) {
+			    	texto = "ERROR: Elementos repetidos que se usan en script: " + usadoElemRepes;
+			    	System.out.println(texto);
+					escribeResultados.escribe(texto+"\n", ficheroSalida);
+			    }		
 			    // ____________________________________________________________________________________________
 			    
 				texto = "elementosRepesUsadosTotal: " + elementosRepesUsadosTotal;

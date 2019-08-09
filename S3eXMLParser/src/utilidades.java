@@ -22,7 +22,6 @@ public class utilidades {
         	if (cadena.charAt(i)=='=') {
     			numArgumentos2++;
     		}
-
     	}
     	
     	if (numArgumentos!=numArgumentos2) {
