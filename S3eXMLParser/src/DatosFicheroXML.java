@@ -75,6 +75,8 @@ public class DatosFicheroXML {
 	
 	// constructor
 		public DatosFicheroXML (File ficheroXML) {
+
+			
 			lista_Obj_S3e_NOMBRE.add("MCS/TipoDeMCS=MCS_focos");
 			lista_Obj_S3e_NOMBRE.add("MCS/TipoDeMCS=MCS_ESgeneral");
 			lista_Obj_S3e_NOMBRE.add("MCS/TipoDeMCS=MCS_ES_hiloDoble");
@@ -87,6 +89,9 @@ public class DatosFicheroXML {
 			lista_Obj_S3e_NOMBRE.add("ED/Ubicacion=ED_Local/Tipo=ED_simpleHilo");
 			lista_Obj_S3e_NOMBRE.add("SD/Ubicacion=SD_Local/Tipo=SD_simple");
 			lista_Obj_S3e_NOMBRE.add("SD/Ubicacion=SD_Local/Tipo=SD_doble");	
+			
+			lista_Obj_S3e_NOMBRE.add("MA/IdentMCSEDMC!65535");
+			lista_Obj_S3e_NOMBRE.add("MA/IdentMCSDR!65535");
 			lista_Obj_S3e_NOMBRE.add("MA");
 			lista_Obj_S3e_NOMBRE.add("MM");
 			//listaNombreObjetosS3e.add("MCS");		
@@ -196,25 +201,44 @@ public class DatosFicheroXML {
 						if (true) {
 							List<String> xxxx = new ArrayList<String>();
 							xxxx		= utilidades.analizaObjArgs(lista_Obj_S3e_NOMBRE.get(startE));
-							int nro_argumentos = (xxxx.size()-1)/2;
+							int nro_argumentos = (xxxx.size()-1)/3;
 							
 							xxxx.get(0);
 							boolean cumpleCriterio = true;
 							
 							if (etiqueta.equalsIgnoreCase(xxxx.get(0))&&xxxx.size()>1) {
-								// recorremos bucle para ver que se cumplen todos los pares de arg/val
+								// recorremos bucle para ver que se cumplen todos los pares de arg/val (teniendo en cuent al operador )
 								// si todos los pares se cumplen, cumpleCriterio = true
-								for (int j=0;j<nro_argumentos;j++) {								
+								for (int j=0;j<nro_argumentos;j++) {
+									String argumento_i = xxxx.get(3*j+1);
+									String operador_i = xxxx.get(3*j+2);
+									String valor_i = xxxx.get(3*j+3);
 									
-									if (!xxxx.get(2*j+2).equalsIgnoreCase(attributes.getValue(xxxx.get(2*j+1)))) {
-										cumpleCriterio = false;
+									String argumento_xml=attributes.getValue(argumento_i);
+									
+									switch (operador_i) {
+									case "=":
+										if (!valor_i.equalsIgnoreCase(argumento_xml)) {
+											cumpleCriterio = false;
+										}
+										break;
+									case "!":
+										if (valor_i.equalsIgnoreCase(argumento_xml)) {
+											cumpleCriterio = false;
+										}
+										break;
 									}
+									
+									
+//									if (!valor_i.equalsIgnoreCase(attributes.getValue(argumento_i))) {
+//										cumpleCriterio = false;
+//									}
 								}
 								
 								if (cumpleCriterio) {
 									obj_XML_NOMBRE.get(startE).add(attributes.getValue("Nombre"));
 									obj_XML_Id.get(startE).add(attributes.getValue("Identificador"));
-									//System.out.println(xxxx+ ": "+attributes.getValue("Nombre")+", " );
+									System.out.println(xxxx+ ": "+attributes.getValue("Nombre")+", " );
 								}
 							}
 						}											
@@ -449,8 +473,7 @@ public class DatosFicheroXML {
 		objeto = "MF/Ubicacion=MF_Local/TipoFoco=MF_noIntermApagado";
 		if(lista_Obj_S3e_NOMBRE.contains(objeto))
 		{
-			int posicion;
-			posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
+			int posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
 			n_estimados_MCS_FNR += lista_Obj_S3e_CANTIDAD.get(posicion)/4; 
 			n_estimados_MCSQ4_AF += lista_Obj_S3e_CANTIDAD.get(posicion)/8;			
 		} else {
@@ -460,8 +483,7 @@ public class DatosFicheroXML {
 		objeto = "MF/Ubicacion=MF_Local/TipoFoco=MF_noIntermEncendido";
 		if(lista_Obj_S3e_NOMBRE.contains(objeto))
 		{
-			int posicion;
-			posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
+			int posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
 			n_estimados_MCS_FR += lista_Obj_S3e_CANTIDAD.get(posicion)/4;
 			n_estimados_MCSQ4_AF += lista_Obj_S3e_CANTIDAD.get(posicion)/8;			
 		} else {
@@ -471,8 +493,7 @@ public class DatosFicheroXML {
 		objeto = "MF/Ubicacion=MF_Local/TipoFoco=MF_IntermApagado";
 		if(lista_Obj_S3e_NOMBRE.contains(objeto))
 		{
-			int posicion;
-			posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);		
+			int posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);		
 			n_estimados_MCS_FNRI += lista_Obj_S3e_CANTIDAD.get(posicion)/2;
 			n_estimados_MCSQ4_AF += lista_Obj_S3e_CANTIDAD.get(posicion)/8;			
 		} else {
@@ -481,8 +502,7 @@ public class DatosFicheroXML {
 		objeto = "MF/Ubicacion=MF_Local/TipoFoco=MF_InterEncFijoReposo";
 		if(lista_Obj_S3e_NOMBRE.contains(objeto))
 		{
-			int posicion;
-			posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
+			int posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
 			n_estimados_MCS_FRI += lista_Obj_S3e_CANTIDAD.get(posicion)/2;
 			n_estimados_MCSQ4_AF += lista_Obj_S3e_CANTIDAD.get(posicion)/8;	
 		} else {
@@ -492,8 +512,7 @@ public class DatosFicheroXML {
 		objeto = "ED/Ubicacion=ED_Local/Tipo=ED_dobleHilo";
 		if(lista_Obj_S3e_NOMBRE.contains(objeto))
 		{
-			int posicion;
-			posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
+			int posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
 			n_estimados_MCS_ESHD += lista_Obj_S3e_CANTIDAD.get(posicion)/8;
 			n_estimados_MCSQ4_AES += lista_Obj_S3e_CANTIDAD.get(posicion)/40;			
 		} else {
@@ -503,8 +522,7 @@ public class DatosFicheroXML {
 		objeto = "ED/Ubicacion=ED_Local/Tipo=ED_dobleConjugada";
 		if(lista_Obj_S3e_NOMBRE.contains(objeto))
 		{
-			int posicion;
-			posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
+			int posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
 			n_estimados_MCS_ES += lista_Obj_S3e_CANTIDAD.get(posicion)/8; 
 			n_estimados_MCSQ4_AES += lista_Obj_S3e_CANTIDAD.get(posicion)/20;   // no estoy seguro
 		} else {
@@ -514,8 +532,7 @@ public class DatosFicheroXML {
 		objeto = "ED/Ubicacion=ED_Local/Tipo=ED_simpleHilo";
 		if(lista_Obj_S3e_NOMBRE.contains(objeto))
 		{
-			int posicion;
-			posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
+			int posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
 			n_estimados_MCS_ES += lista_Obj_S3e_CANTIDAD.get(posicion)/16; 
 			n_estimados_MCSQ4_AES += lista_Obj_S3e_CANTIDAD.get(posicion)/40;   // no estoy seguro
 		} else {
@@ -525,20 +542,39 @@ public class DatosFicheroXML {
 		objeto = "MA";
 		if(lista_Obj_S3e_NOMBRE.contains(objeto))
 		{
-			int posicion;
-			posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
-			n_estimados_MCS_ES += lista_Obj_S3e_CANTIDAD.get(posicion)/2 + 1/8; //1/8 por el final de carrera
-			n_estimados_MCS_SD += lista_Obj_S3e_CANTIDAD.get(posicion)/2 + 1/8;  
+			int posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
+			n_estimados_MCS_ES += lista_Obj_S3e_CANTIDAD.get(posicion) * (1/2 + 1/8); //1/8 por el final de carrera
+			n_estimados_MCS_SD += lista_Obj_S3e_CANTIDAD.get(posicion) * (1/2);  
 			n_estimados_MCSQ4_AES += lista_Obj_S3e_CANTIDAD.get(posicion)/4;   // no estoy seguro
 		} else {
 			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
 		}
+
+		objeto = "MA/IdentMCSEDMC!65535";
+		if(lista_Obj_S3e_NOMBRE.contains(objeto))
+		{
+			int posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
+			n_estimados_MCS_ES += lista_Obj_S3e_CANTIDAD.get(posicion) * (1/8); //1/8 por las ED de ML			  
+			//////////////////n_estimados_MCSQ4_AES += lista_Obj_S3e_CANTIDAD.get(posicion)/4;   // no estoy seguro
+		} else {
+			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
+		}
+		
+		objeto = "MA/IdentMCSDR!65535";
+		if(lista_Obj_S3e_NOMBRE.contains(objeto))
+		{
+			int posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
+			n_estimados_MCS_ES += lista_Obj_S3e_CANTIDAD.get(posicion) * (1/8); //1/8 por las ED de ML			  
+			///////////////////n_estimados_MCSQ4_AES += lista_Obj_S3e_CANTIDAD.get(posicion)/4;   // no estoy seguro
+		} else {
+			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
+		}
+
 		
 		objeto = "MM";
 		if(lista_Obj_S3e_NOMBRE.contains(objeto))
 		{
-			int posicion;
-			posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
+			int posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
 			n_estimados_MCS_ESHD += lista_Obj_S3e_CANTIDAD.get(posicion)/2 ; 
 			n_estimados_MCSQ4_AES += lista_Obj_S3e_CANTIDAD.get(posicion)/4;
 		} else {
@@ -558,8 +594,7 @@ public class DatosFicheroXML {
 		objeto = "SD/Ubicacion=SD_Local/Tipo=SD_doble";
 		if(lista_Obj_S3e_NOMBRE.contains(objeto))
 		{
-			int posicion;
-			posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
+			int posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
 			n_estimados_MCS_SD += lista_Obj_S3e_CANTIDAD.get(posicion)/2 ; 
 			n_estimados_MCSQ4_AES += lista_Obj_S3e_CANTIDAD.get(posicion)/8;
 		} else {

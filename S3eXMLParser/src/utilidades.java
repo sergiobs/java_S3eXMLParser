@@ -4,7 +4,7 @@ import java.util.List;
 public class utilidades {
     static List<String> analizaObjArgs(String cadena){   
     	
-    	// descompone la cadena "ED/Ubicacion=ED_Local/Tipo=ED_dobleHilo" en un arraylist: [ED, Ubicacion, ED_local, Tipo ED_dobleHilo]
+    	// descompone la cadena "ED/Ubicacion=ED_Local/Tipo!=ED_dobleHilo" en un arraylist: [ED, Ubicacion, =, ED_local, !, Tipo ED_dobleHilo]
     	//
     	// es decir, [TipoObjetoS3e, argumento1, valor1, argumento2, valor2, ....]
     	
@@ -13,6 +13,7 @@ public class utilidades {
     	String tipoObjetoS3e ="";
     	String argumento_i ="";
     	String valor_i ="";
+    	String operador_i ="";
     	
     	List<String> listaObjeto_Argumentos = new ArrayList<String>();
     	for (int i=0; i<cadena.length();i++) {
@@ -20,6 +21,9 @@ public class utilidades {
     			numArgumentos++;
     		}
         	if (cadena.charAt(i)=='=') {
+    			numArgumentos2++;
+    		}
+        	if (cadena.charAt(i)=='!') {
     			numArgumentos2++;
     		}
     	}
@@ -38,28 +42,32 @@ public class utilidades {
     	boolean leoTipoObjeto = true;
     	boolean leoArgumento = false;
     	boolean leoValor = false;
+  //  	boolean leoOperador = false;
     	
     	for (int i=0; i<cadena.length();i++) {
     		
     		if (cadena.charAt(i)=='/') {
-    			if (leoTipoObjeto) listaObjeto_Argumentos.add(tipoObjetoS3e);
+    			if (leoTipoObjeto) {
+    				listaObjeto_Argumentos.add(tipoObjetoS3e);
+    			}
     			if (leoValor) {
     				listaObjeto_Argumentos.add(valor_i);
     				valor_i="";
     			}
     			leoTipoObjeto = false;
     			leoArgumento = true;
-    			leoValor = false; 
+    			leoValor = false;    			
     			i++;
     		}   		
-    		if (cadena.charAt(i)=='=') {
+    		if ((cadena.charAt(i)=='=')||(cadena.charAt(i)=='!')) {    			
     			if (leoArgumento) {
     				listaObjeto_Argumentos.add(argumento_i);
+    				listaObjeto_Argumentos.add(""+cadena.charAt(i));
     				argumento_i="";
     			}
     			leoTipoObjeto = false;
     			leoArgumento = false;
-    			leoValor = true; 
+    			leoValor = true;     			
     			i++;
     		}     		
     		
@@ -80,6 +88,7 @@ public class utilidades {
     		if (leoValor) {
     			valor_i+=cadena.charAt(i);    			
     		}
+
     	}  	
     	int ggg=0;
     	ggg++;;

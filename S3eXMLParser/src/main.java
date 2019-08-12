@@ -19,7 +19,9 @@ import java.sql.Timestamp;
 //020 		* Lee tipos de objeto de S3e que cumplan criterios de varios arguemntos/valores
 //			* Calcula numero MCSs teoricos en S3e y Q4
 //			  020.01 	* optimizacion de codigo
-
+//021 		* Lee tipos de objeto de S3e que cumplan criterios de varios arguemntos/valores y además 
+//            un criterio que puede ser de '=' o '!' (distinto). ASi es posible buscar por ejemplo
+//            objetos que cumplan que determinado argumento sea distinto de 65535
 
 public class main {
 	
@@ -33,7 +35,7 @@ public class main {
 		int nivelTraza = 2;
 		
 		// indicamos la ruta donde vamos a buscar los xml o bien la recogemos de argumento 1
-		String rutaBase = "C:\\temp5";
+		String rutaBase = "C:\\temp3";
 		//String rutaBase = "C:\\CAFs_SBS\\ENCE\\ramas\\ENCE_DESARROLLO\\SIST\\Validación\\Entorno\\";	
 		
 		if (argv.length> 0) {
