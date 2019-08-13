@@ -6,7 +6,7 @@ public class utilidades {
     	
     	// descompone la cadena "ED/Ubicacion=ED_Local/Tipo!=ED_dobleHilo" en un arraylist: [ED, Ubicacion, =, ED_local, !, Tipo ED_dobleHilo]
     	//
-    	// es decir, [TipoObjetoS3e, argumento1, valor1, argumento2, valor2, ....]
+    	// es decir, [TipoObjetoS3e, argumento1, operador1, valor1, argumento2, operador2, valor2, ....]
     	
     	int numArgumentos = 0;
     	int numArgumentos2 = 0;
@@ -37,13 +37,10 @@ public class utilidades {
     		return listaObjeto_Argumentos;
     	}
     	
-    	//listaObjeto_Argumentos.add(e); 
-    	
     	boolean leoTipoObjeto = true;
     	boolean leoArgumento = false;
     	boolean leoValor = false;
-  //  	boolean leoOperador = false;
-    	
+
     	for (int i=0; i<cadena.length();i++) {
     		
     		if (cadena.charAt(i)=='/') {

@@ -22,12 +22,13 @@ import java.sql.Timestamp;
 //021 		* Lee tipos de objeto de S3e que cumplan criterios de varios arguemntos/valores y además 
 //            un criterio que puede ser de '=' o '!' (distinto). ASi es posible buscar por ejemplo
 //            objetos que cumplan que determinado argumento sea distinto de 65535
+//022 		* Se corrige el conteo de MCS 
 
 public class main {
 	
 	public static void main(String argv[])   {		
 		String texto="";
-		//String entradaTeclado = "";
+		
 		Scanner entradaEscaner = new Scanner (System.in);
 		boolean calculaNombreObjetosRepetidosEnXML = false;
 		boolean calculaIdentificadorObjetos_noUsadosEnXML = false;
@@ -45,13 +46,15 @@ public class main {
 			
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 		String ficheroSalidaNombre="";
+		String ficheroSalidaNombre_numMCS="";
 		ficheroSalidaNombre =timestamp+"";
-		ficheroSalidaNombre=ficheroSalidaNombre.replace(":", "-");		
+		ficheroSalidaNombre=ficheroSalidaNombre.replace(":", "-");	
+		ficheroSalidaNombre_numMCS=ficheroSalidaNombre+"_numMCS";
 		
 		File ficheroSalida = new File(ruta.getAbsolutePath() + "\\analisisXML_"+ficheroSalidaNombre+".txt");		
-		if (ficheroSalida.exists()) {
-			ficheroSalida.delete();
-		}
+//		if (ficheroSalida.exists()) {
+//			ficheroSalida.delete();
+//		}
 
 		List<File> listaFicherosXML = new ArrayList<File>();
 		List<File> listaFicherosXML_validos = new ArrayList<File>();		

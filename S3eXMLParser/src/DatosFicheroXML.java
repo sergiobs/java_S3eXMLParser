@@ -75,7 +75,6 @@ public class DatosFicheroXML {
 	
 	// constructor
 		public DatosFicheroXML (File ficheroXML) {
-
 			
 			lista_Obj_S3e_NOMBRE.add("MCS/TipoDeMCS=MCS_focos");
 			lista_Obj_S3e_NOMBRE.add("MCS/TipoDeMCS=MCS_ESgeneral");
@@ -94,19 +93,20 @@ public class DatosFicheroXML {
 			lista_Obj_S3e_NOMBRE.add("MA/IdentMCSDR!65535");
 			lista_Obj_S3e_NOMBRE.add("MA");
 			lista_Obj_S3e_NOMBRE.add("MM");
-			//listaNombreObjetosS3e.add("MCS");		
-			//lista_Obj_S3e_NOMBRE.add("ED");	
-			//listaNombreObjetosS3e.add("CSE");		
-			//lista_Obj_S3e_NOMBRE.add("SD");
-			//lista_Obj_S3e_NOMBRE.add("MF");
-			lista_Obj_S3e_NOMBRE.add("IF");
-			lista_Obj_S3e_NOMBRE.add("IS");
+			
+						
+
+			
+			// Activar estos solo para buscar elementos no usados o duplicados, no para dimensionar MCS
 			//listaNombreObjetosS3e.add("PV");
-			lista_Obj_S3e_NOMBRE.add("SE");
-			lista_Obj_S3e_NOMBRE.add("CV");
-			lista_Obj_S3e_NOMBRE.add("AG");
-			lista_Obj_S3e_NOMBRE.add("MO");
-			lista_Obj_S3e_NOMBRE.add("ML");		
+			//lista_Obj_S3e_NOMBRE.add("SE");
+			//lista_Obj_S3e_NOMBRE.add("CV");
+			//lista_Obj_S3e_NOMBRE.add("AG");
+			//lista_Obj_S3e_NOMBRE.add("MO");
+			//lista_Obj_S3e_NOMBRE.add("ML");
+			//lista_Obj_S3e_NOMBRE.add("IF");
+			//lista_Obj_S3e_NOMBRE.add("IS");
+			
 			this.num_Obj_S3e = lista_Obj_S3e_NOMBRE.size();
 			this.fichero = ficheroXML;
 			this.pathScriptsAutomaticos="";
@@ -228,11 +228,6 @@ public class DatosFicheroXML {
 										}
 										break;
 									}
-									
-									
-//									if (!valor_i.equalsIgnoreCase(attributes.getValue(argumento_i))) {
-//										cumpleCriterio = false;
-//									}
 								}
 								
 								if (cumpleCriterio) {
@@ -331,17 +326,40 @@ public class DatosFicheroXML {
 						"MCS_FNRI: " + n_estimados_MCS_FNRI +"\n" +
 						"MCS_ES: " + n_estimados_MCS_ES +"\n" +
 						"MCS_ESHD: " + n_estimados_MCS_ESHD +"\n" +
-						"MCS_(SD): " + n_estimados_MCS_SD;
-		
+						"MCS_(SD): " + n_estimados_MCS_SD;		
 		
 		texto2print+="\nMCS Focos: " + (n_estimados_MCS_FR +n_estimados_MCS_FNR+ n_estimados_MCS_FRI+ n_estimados_MCS_FNRI) +	"\n" +					
 				"MCS ES(por ED): " + (n_estimados_MCS_ES +n_estimados_MCS_ESHD) +  "\n" +
 				"MCS ES(por SD): " + (n_estimados_MCS_SD );
 		texto2print+="\nMCS Total: " + 
 				(n_estimados_MCS_FR +n_estimados_MCS_FNR+ n_estimados_MCS_FRI+ n_estimados_MCS_FNRI + n_estimados_MCS_ES +n_estimados_MCS_ESHD) +  " / " + 
-				(n_estimados_MCS_FR +n_estimados_MCS_FNR+ n_estimados_MCS_FRI+ n_estimados_MCS_FNRI + n_estimados_MCS_SD);
-		texto2print+="\nMCSQ4 Total: " + 
-				(n_estimados_MCSQ4_AF +n_estimados_MCSQ4_AES);
+				(n_estimados_MCS_FR +n_estimados_MCS_FNR+ n_estimados_MCS_FRI+ n_estimados_MCS_FNRI + n_estimados_MCS_SD)+"\n";
+		
+		texto2print+=   "Q4_FNR: " + n_estimados_Q4_FNR	+", ";
+		texto2print+=   "Q4_FR: " +n_estimados_Q4_FR	+", ";
+		texto2print+=   "Q4_SD: " +n_estimados_Q4_SD	+", ";
+		texto2print+=   "Q4_ED: " +n_estimados_Q4_ED		+", ";
+		texto2print+=   "Q4_AGelec: " +n_estimados_Q4_AGelec	+", ";
+		texto2print+=   "Q4_AGmec: " +n_estimados_Q4_AGmec	+", ";
+
+		
+		texto2print+="\nMCSQ4 Total (AF, AES (por SD), AES_ED (por ED)): " + 
+				(n_estimados_MCSQ4_AF + ", " + n_estimados_MCSQ4_AES_Salidas + ", " + n_estimados_MCSQ4_AES_Entradas );
+		
+		
+		
+		
+		
+		float nTotal = 0;
+		if (n_estimados_MCSQ4_AES_Salidas>n_estimados_MCSQ4_AES_Entradas) {
+			nTotal = n_estimados_MCSQ4_AF + n_estimados_MCSQ4_AES_Salidas;
+			texto2print+="\nMCSQ4 Total (SD>ED): " + nTotal;
+		}else {
+			nTotal = n_estimados_MCSQ4_AF + n_estimados_MCSQ4_AES_Entradas;
+			texto2print+="\nMCSQ4 Total (SD<ED): " + nTotal;
+		}
+		
+		
 		return texto2print;
 	}
 	
@@ -469,13 +487,29 @@ public class DatosFicheroXML {
 	}
 	
 	public void estimaMCS() {
+		
+		// Consideraciones Q4e:
+		// MCS-AES
+		//		* 8  SD Dobles
+		//		* 40 ED
+		//		* 4  agujas
+		// MCS-AF
+		// 		* 8 Salidas de focos (intermitentes o no)
+		// 			+ Las 4 primeras Salidas FNR
+		//			+ Las 2 siguientes salidas para FR
+		//			+ Las 2 siguientes con configurables
+		
+		
+		
+		// ----------------- FOCOS ------------------------------------------------------
 		String objeto; 		
 		objeto = "MF/Ubicacion=MF_Local/TipoFoco=MF_noIntermApagado";
 		if(lista_Obj_S3e_NOMBRE.contains(objeto))
 		{
-			int posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
-			n_estimados_MCS_FNR += lista_Obj_S3e_CANTIDAD.get(posicion)/4; 
-			n_estimados_MCSQ4_AF += lista_Obj_S3e_CANTIDAD.get(posicion)/8;			
+			int posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);
+			n_estimados_MCS_FNR += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/4; 
+			n_estimados_Q4_FNR += lista_Obj_S3e_CANTIDAD.get(posicion);
+			n_estimados_MCSQ4_AF += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/8;
 		} else {
 			System.out.println("ERROR: para estimar MCS, debe tenerse en cuenta " +  objeto );
 		}
@@ -483,9 +517,10 @@ public class DatosFicheroXML {
 		objeto = "MF/Ubicacion=MF_Local/TipoFoco=MF_noIntermEncendido";
 		if(lista_Obj_S3e_NOMBRE.contains(objeto))
 		{
-			int posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
-			n_estimados_MCS_FR += lista_Obj_S3e_CANTIDAD.get(posicion)/4;
-			n_estimados_MCSQ4_AF += lista_Obj_S3e_CANTIDAD.get(posicion)/8;			
+			int posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);
+			n_estimados_MCS_FR += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/4;
+			n_estimados_Q4_FR += lista_Obj_S3e_CANTIDAD.get(posicion);
+			n_estimados_MCSQ4_AF += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/8;			
 		} else {
 			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
 		}
@@ -493,9 +528,10 @@ public class DatosFicheroXML {
 		objeto = "MF/Ubicacion=MF_Local/TipoFoco=MF_IntermApagado";
 		if(lista_Obj_S3e_NOMBRE.contains(objeto))
 		{
-			int posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);		
-			n_estimados_MCS_FNRI += lista_Obj_S3e_CANTIDAD.get(posicion)/2;
-			n_estimados_MCSQ4_AF += lista_Obj_S3e_CANTIDAD.get(posicion)/8;			
+			int posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);
+			n_estimados_MCS_FNRI += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/2;
+			n_estimados_Q4_FNR += lista_Obj_S3e_CANTIDAD.get(posicion);
+			n_estimados_MCSQ4_AF += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/8;
 		} else {
 			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
 		}
@@ -503,18 +539,23 @@ public class DatosFicheroXML {
 		if(lista_Obj_S3e_NOMBRE.contains(objeto))
 		{
 			int posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
-			n_estimados_MCS_FRI += lista_Obj_S3e_CANTIDAD.get(posicion)/2;
-			n_estimados_MCSQ4_AF += lista_Obj_S3e_CANTIDAD.get(posicion)/8;	
+			n_estimados_MCS_FRI += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/2;
+			n_estimados_Q4_FR += lista_Obj_S3e_CANTIDAD.get(posicion);
+			n_estimados_MCSQ4_AF += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/8;	
 		} else {
 			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
 		}
 		
+		// ------------------------------------------------------------------------------
+		
+		// ----------------- ED ------------------------------------------------------
 		objeto = "ED/Ubicacion=ED_Local/Tipo=ED_dobleHilo";
 		if(lista_Obj_S3e_NOMBRE.contains(objeto))
 		{
 			int posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
-			n_estimados_MCS_ESHD += lista_Obj_S3e_CANTIDAD.get(posicion)/8;
-			n_estimados_MCSQ4_AES += lista_Obj_S3e_CANTIDAD.get(posicion)/40;			
+			n_estimados_MCS_ESHD += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/8;
+			n_estimados_Q4_ED += lista_Obj_S3e_CANTIDAD.get(posicion);
+			n_estimados_MCSQ4_AES_Entradas += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/40;			
 		} else {
 			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
 		}
@@ -523,8 +564,9 @@ public class DatosFicheroXML {
 		if(lista_Obj_S3e_NOMBRE.contains(objeto))
 		{
 			int posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
-			n_estimados_MCS_ES += lista_Obj_S3e_CANTIDAD.get(posicion)/8; 
-			n_estimados_MCSQ4_AES += lista_Obj_S3e_CANTIDAD.get(posicion)/20;   // no estoy seguro
+			n_estimados_MCS_ES += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/8; 
+			n_estimados_Q4_ED += lista_Obj_S3e_CANTIDAD.get(posicion)*2;
+			n_estimados_MCSQ4_AES_Entradas += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/20;
 		} else {
 			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
 		}
@@ -533,39 +575,48 @@ public class DatosFicheroXML {
 		if(lista_Obj_S3e_NOMBRE.contains(objeto))
 		{
 			int posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
-			n_estimados_MCS_ES += lista_Obj_S3e_CANTIDAD.get(posicion)/16; 
-			n_estimados_MCSQ4_AES += lista_Obj_S3e_CANTIDAD.get(posicion)/40;   // no estoy seguro
+			n_estimados_MCS_ES += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/16;
+			n_estimados_Q4_ED += lista_Obj_S3e_CANTIDAD.get(posicion);			
+			n_estimados_MCSQ4_AES_Entradas += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/40;
 		} else {
 			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
 		}
+		// ------------------------------------------------------------------------------
+				
+		
+		// ----------------- AGUJAS ------------------------------------------------------
 		
 		objeto = "MA";
 		if(lista_Obj_S3e_NOMBRE.contains(objeto))
 		{
 			int posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
-			n_estimados_MCS_ES += lista_Obj_S3e_CANTIDAD.get(posicion) * (1/2 + 1/8); //1/8 por el final de carrera
-			n_estimados_MCS_SD += lista_Obj_S3e_CANTIDAD.get(posicion) * (1/2);  
-			n_estimados_MCSQ4_AES += lista_Obj_S3e_CANTIDAD.get(posicion)/4;   // no estoy seguro
+			n_estimados_MCS_ES += (float) lista_Obj_S3e_CANTIDAD.get(posicion) * (1/2 + 1/8); //1/8 por el final de carrera
+			n_estimados_MCS_SD += (float) lista_Obj_S3e_CANTIDAD.get(posicion) * (1/2);  
+			n_estimados_Q4_AGelec += lista_Obj_S3e_CANTIDAD.get(posicion);
+			n_estimados_MCSQ4_AES_Entradas += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/4;
+			n_estimados_MCSQ4_AES_Salidas += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/4;
 		} else {
 			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
 		}
 
-		objeto = "MA/IdentMCSEDMC!65535";
+		objeto = "MA/IdentMCSEDMC!65535";  // Agujas que tienen Mando Local
 		if(lista_Obj_S3e_NOMBRE.contains(objeto))
 		{
 			int posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
-			n_estimados_MCS_ES += lista_Obj_S3e_CANTIDAD.get(posicion) * (1/8); //1/8 por las ED de ML			  
-			//////////////////n_estimados_MCSQ4_AES += lista_Obj_S3e_CANTIDAD.get(posicion)/4;   // no estoy seguro
+			n_estimados_MCS_ES += (float) lista_Obj_S3e_CANTIDAD.get(posicion) * (1/8); //1/8 por las ED de ML
+			n_estimados_Q4_ED += lista_Obj_S3e_CANTIDAD.get(posicion)*2;
+			n_estimados_MCSQ4_AES_Entradas += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/20;
 		} else {
 			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
 		}
 		
-		objeto = "MA/IdentMCSDR!65535";
+		objeto = "MA/IdentMCSDR!65535";  // Agujas con detector de rueda
 		if(lista_Obj_S3e_NOMBRE.contains(objeto))
 		{
 			int posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
-			n_estimados_MCS_ES += lista_Obj_S3e_CANTIDAD.get(posicion) * (1/8); //1/8 por las ED de ML			  
-			///////////////////n_estimados_MCSQ4_AES += lista_Obj_S3e_CANTIDAD.get(posicion)/4;   // no estoy seguro
+			n_estimados_MCS_ES += (float) lista_Obj_S3e_CANTIDAD.get(posicion) * (1/4); //1/4 por las ED de Detector de rueda			  
+			n_estimados_Q4_ED += lista_Obj_S3e_CANTIDAD.get(posicion)*2;
+			n_estimados_MCSQ4_AES_Entradas += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/20;
 		} else {
 			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
 		}
@@ -575,19 +626,26 @@ public class DatosFicheroXML {
 		if(lista_Obj_S3e_NOMBRE.contains(objeto))
 		{
 			int posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
-			n_estimados_MCS_ESHD += lista_Obj_S3e_CANTIDAD.get(posicion)/2 ; 
-			n_estimados_MCSQ4_AES += lista_Obj_S3e_CANTIDAD.get(posicion)/4;
+			n_estimados_MCS_ESHD += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/2 ; 
+			n_estimados_Q4_AGmec += lista_Obj_S3e_CANTIDAD.get(posicion);
+			n_estimados_MCSQ4_AES_Entradas += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/4;
+			n_estimados_MCSQ4_AES_Salidas += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/4;
 		} else {
 			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
 		}
+		
+		// ------------------------------------------------------------------------------
+				
+		// ----------------- SD ------------------------------------------------------
 		
 		objeto = "SD/Ubicacion=SD_Local/Tipo=SD_simple";
 		if(lista_Obj_S3e_NOMBRE.contains(objeto))
 		{
 			int posicion;
 			posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
-			n_estimados_MCS_SD += lista_Obj_S3e_CANTIDAD.get(posicion)/4 ; 
-			n_estimados_MCSQ4_AES += lista_Obj_S3e_CANTIDAD.get(posicion)/8;
+			n_estimados_MCS_SD += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/4 ; 
+			n_estimados_Q4_SD += lista_Obj_S3e_CANTIDAD.get(posicion);
+			n_estimados_MCSQ4_AES_Salidas += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/8;
 		} else {
 			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
 		}
@@ -595,11 +653,13 @@ public class DatosFicheroXML {
 		if(lista_Obj_S3e_NOMBRE.contains(objeto))
 		{
 			int posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
-			n_estimados_MCS_SD += lista_Obj_S3e_CANTIDAD.get(posicion)/2 ; 
-			n_estimados_MCSQ4_AES += lista_Obj_S3e_CANTIDAD.get(posicion)/8;
+			n_estimados_MCS_SD +=(float)  lista_Obj_S3e_CANTIDAD.get(posicion)/2 ; 
+			n_estimados_Q4_SD += lista_Obj_S3e_CANTIDAD.get(posicion);
+			n_estimados_MCSQ4_AES_Salidas += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/8;
 		} else {
 			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
 		}		
+		// ------------------------------------------------------------------------------
 	}
 	
 	private int devuelveIndiceObjetoS3e(String nombreObjetoS3e) {
@@ -635,6 +695,16 @@ public class DatosFicheroXML {
 	private float n_estimados_MCS_ES = 0;
 	private float n_estimados_MCS_ESHD = 0;	
 	private float n_estimados_MCS_SD = 0;	
-	private float n_estimados_MCSQ4_AES = 0;
+	private float n_estimados_MCSQ4_AES_Entradas = 0;
+	private float n_estimados_MCSQ4_AES_Salidas = 0;
 	private float n_estimados_MCSQ4_AF = 0;
+	
+	private int n_estimados_Q4_FNR = 0;
+	private int n_estimados_Q4_FR = 0;
+	private int n_estimados_Q4_SD = 0;
+	private int n_estimados_Q4_ED = 0;	
+	private int n_estimados_Q4_AGelec = 0;
+	private int n_estimados_Q4_AGmec = 0;
+
+	
 }
