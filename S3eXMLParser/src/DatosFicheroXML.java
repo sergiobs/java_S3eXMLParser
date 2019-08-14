@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -93,8 +94,6 @@ public class DatosFicheroXML {
 			lista_Obj_S3e_NOMBRE.add("MA/IdentMCSDR!65535");
 			lista_Obj_S3e_NOMBRE.add("MA");
 			lista_Obj_S3e_NOMBRE.add("MM");
-			
-						
 
 			
 			// Activar estos solo para buscar elementos no usados o duplicados, no para dimensionar MCS
@@ -233,7 +232,7 @@ public class DatosFicheroXML {
 								if (cumpleCriterio) {
 									obj_XML_NOMBRE.get(startE).add(attributes.getValue("Nombre"));
 									obj_XML_Id.get(startE).add(attributes.getValue("Identificador"));
-									System.out.println(xxxx+ ": "+attributes.getValue("Nombre")+", " );
+									//System.out.println(xxxx+ ": "+attributes.getValue("Nombre")+", " );
 								}
 							}
 						}											
@@ -345,23 +344,61 @@ public class DatosFicheroXML {
 		
 		texto2print+="\nMCSQ4 Total (AF, AES (por SD), AES_ED (por ED)): " + 
 				(n_estimados_MCSQ4_AF + ", " + n_estimados_MCSQ4_AES_Salidas + ", " + n_estimados_MCSQ4_AES_Entradas );
-		
-		
-		
-		
-		
+
+		DecimalFormat df = new DecimalFormat("#.00");				
 		float nTotal = 0;
 		if (n_estimados_MCSQ4_AES_Salidas>n_estimados_MCSQ4_AES_Entradas) {
 			nTotal = n_estimados_MCSQ4_AF + n_estimados_MCSQ4_AES_Salidas;
-			texto2print+="\nMCSQ4 Total (SD>ED): " + nTotal;
+			texto2print+="\nMCSQ4 Total (SD>ED): " + df.format(nTotal);
 		}else {
 			nTotal = n_estimados_MCSQ4_AF + n_estimados_MCSQ4_AES_Entradas;
-			texto2print+="\nMCSQ4 Total (SD<ED): " + nTotal;
+			texto2print+="\nMCSQ4 Total (SD<ED): " + df.format(nTotal);
 		}
-		
-		
 		return texto2print;
 	}
+
+	public String imprimeMCS_Estimados_corto () {
+		String texto2print ="";
+		DecimalFormat df = new DecimalFormat("#.00");				
+		float nTotal = 0;
+		if (n_estimados_MCSQ4_AES_Salidas>n_estimados_MCSQ4_AES_Entradas) {
+			nTotal = n_estimados_MCSQ4_AF + n_estimados_MCSQ4_AES_Salidas;
+			texto2print+="\t" + df.format(nTotal);
+		}else {
+			nTotal = n_estimados_MCSQ4_AF + n_estimados_MCSQ4_AES_Entradas;
+			texto2print+="\t" + df.format(nTotal);
+		}
+		return texto2print;
+	}	
+
+
+	public String imprimeMCS_EstimadosF () {
+		String texto2print ="";
+		DecimalFormat df = new DecimalFormat("#.00");				
+		float nTotal = 0;
+		if (n_estimados_MCSQ4_AES_Salidas_ahorro>n_estimados_MCSQ4_AES_Entradas_ahorro) {
+			nTotal = n_estimados_MCSQ4_AF_ahorro + n_estimados_MCSQ4_AES_Salidas_ahorro;
+			texto2print+="" + df.format(nTotal);
+		}else {
+			nTotal = n_estimados_MCSQ4_AF_ahorro + n_estimados_MCSQ4_AES_Entradas_ahorro;
+			texto2print+="" + df.format(nTotal);
+		}
+		return texto2print;
+	}	
+
+	public String imprimeMCS_EstimadosF_corto () {
+		String texto2print ="";
+		DecimalFormat df = new DecimalFormat("#.00");				
+		float nTotal = 0;
+		if (n_estimados_MCSQ4_AES_Salidas_ahorro>n_estimados_MCSQ4_AES_Entradas_ahorro) {
+			nTotal = n_estimados_MCSQ4_AF_ahorro + n_estimados_MCSQ4_AES_Salidas_ahorro;
+			texto2print+="\t" + df.format(nTotal);
+		}else {
+			nTotal = n_estimados_MCSQ4_AF_ahorro + n_estimados_MCSQ4_AES_Entradas_ahorro;
+			texto2print+="\t" + df.format(nTotal);
+		}
+		return texto2print;
+	}	
 	
 	public String imprimeIdentificadorObjetoNoUsados (String tipoObjetoS3e) {
 		int inTipoObjetoS3e = devuelveIndiceObjetoS3e(tipoObjetoS3e);
@@ -486,7 +523,7 @@ public class DatosFicheroXML {
 		return  imprimeError;
 	}
 	
-	public void estimaMCS() {
+	public int estimaMCS() {
 		
 		// Consideraciones Q4e:
 		// MCS-AES
@@ -512,6 +549,7 @@ public class DatosFicheroXML {
 			n_estimados_MCSQ4_AF += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/8;
 		} else {
 			System.out.println("ERROR: para estimar MCS, debe tenerse en cuenta " +  objeto );
+			return -1;
 		}
 				
 		objeto = "MF/Ubicacion=MF_Local/TipoFoco=MF_noIntermEncendido";
@@ -523,6 +561,7 @@ public class DatosFicheroXML {
 			n_estimados_MCSQ4_AF += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/8;			
 		} else {
 			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
+			return -1;
 		}
 		
 		objeto = "MF/Ubicacion=MF_Local/TipoFoco=MF_IntermApagado";
@@ -534,6 +573,7 @@ public class DatosFicheroXML {
 			n_estimados_MCSQ4_AF += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/8;
 		} else {
 			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
+			return -1;
 		}
 		objeto = "MF/Ubicacion=MF_Local/TipoFoco=MF_InterEncFijoReposo";
 		if(lista_Obj_S3e_NOMBRE.contains(objeto))
@@ -544,6 +584,7 @@ public class DatosFicheroXML {
 			n_estimados_MCSQ4_AF += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/8;	
 		} else {
 			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
+			return -1;
 		}
 		
 		// ------------------------------------------------------------------------------
@@ -558,6 +599,7 @@ public class DatosFicheroXML {
 			n_estimados_MCSQ4_AES_Entradas += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/40;			
 		} else {
 			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
+			return -1;
 		}
 		
 		objeto = "ED/Ubicacion=ED_Local/Tipo=ED_dobleConjugada";
@@ -569,6 +611,7 @@ public class DatosFicheroXML {
 			n_estimados_MCSQ4_AES_Entradas += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/20;
 		} else {
 			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
+			return -1;
 		}
 		
 		objeto = "ED/Ubicacion=ED_Local/Tipo=ED_simpleHilo";
@@ -580,6 +623,7 @@ public class DatosFicheroXML {
 			n_estimados_MCSQ4_AES_Entradas += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/40;
 		} else {
 			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
+			return -1;
 		}
 		// ------------------------------------------------------------------------------
 				
@@ -597,6 +641,7 @@ public class DatosFicheroXML {
 			n_estimados_MCSQ4_AES_Salidas += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/4;
 		} else {
 			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
+			return -1;
 		}
 
 		objeto = "MA/IdentMCSEDMC!65535";  // Agujas que tienen Mando Local
@@ -608,6 +653,7 @@ public class DatosFicheroXML {
 			n_estimados_MCSQ4_AES_Entradas += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/20;
 		} else {
 			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
+			return -1;
 		}
 		
 		objeto = "MA/IdentMCSDR!65535";  // Agujas con detector de rueda
@@ -619,6 +665,7 @@ public class DatosFicheroXML {
 			n_estimados_MCSQ4_AES_Entradas += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/20;
 		} else {
 			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
+			return -1;
 		}
 
 		
@@ -632,6 +679,7 @@ public class DatosFicheroXML {
 			n_estimados_MCSQ4_AES_Salidas += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/4;
 		} else {
 			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
+			return -1;
 		}
 		
 		// ------------------------------------------------------------------------------
@@ -648,6 +696,7 @@ public class DatosFicheroXML {
 			n_estimados_MCSQ4_AES_Salidas += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/8;
 		} else {
 			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
+			return -1;
 		}
 		objeto = "SD/Ubicacion=SD_Local/Tipo=SD_doble";
 		if(lista_Obj_S3e_NOMBRE.contains(objeto))
@@ -658,8 +707,53 @@ public class DatosFicheroXML {
 			n_estimados_MCSQ4_AES_Salidas += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/8;
 		} else {
 			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
-		}		
+			return -1;
+		}	
+		return 0;
 		// ------------------------------------------------------------------------------
+	}
+	
+	
+public int estimaMCS_ahorro() {
+		String objeto; 		
+		objeto = "MF/Ubicacion=MF_Local/TipoFoco=MF_noIntermApagado";
+		int posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);
+		n_estimados_MCSQ4_AF_ahorro = n_estimados_MCSQ4_AF - (float) listaIdentificadorObjetos_noUsadosEnXML.get(posicion).size()/8;
+
+		objeto = "MF/Ubicacion=MF_Local/TipoFoco=MF_noIntermEncendido";
+		posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);
+		n_estimados_MCSQ4_AF_ahorro = n_estimados_MCSQ4_AF_ahorro - (float) listaIdentificadorObjetos_noUsadosEnXML.get(posicion).size()/8;
+
+		objeto = "MF/Ubicacion=MF_Local/TipoFoco=MF_IntermApagado";
+		posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);
+		n_estimados_MCSQ4_AF_ahorro = n_estimados_MCSQ4_AF_ahorro - (float) listaIdentificadorObjetos_noUsadosEnXML.get(posicion).size()/8;
+
+		objeto = "ED/Ubicacion=ED_Local/Tipo=ED_dobleHilo";
+		posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);
+		n_estimados_MCSQ4_AES_Entradas_ahorro = n_estimados_MCSQ4_AES_Entradas - (float) listaIdentificadorObjetos_noUsadosEnXML.get(posicion).size()/40;
+
+		objeto = "ED/Ubicacion=ED_Local/Tipo=ED_simpleHilo";
+		posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);
+		n_estimados_MCSQ4_AES_Entradas_ahorro = n_estimados_MCSQ4_AES_Entradas_ahorro - (float) listaIdentificadorObjetos_noUsadosEnXML.get(posicion).size()/40;
+
+		objeto = "ED/Ubicacion=ED_Local/Tipo=ED_dobleConjugada";
+		posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);
+		n_estimados_MCSQ4_AES_Entradas_ahorro = n_estimados_MCSQ4_AES_Entradas_ahorro - (float) listaIdentificadorObjetos_noUsadosEnXML.get(posicion).size()/20;		
+
+		objeto = "SD/Ubicacion=SD_Local/Tipo=SD_doble";
+		posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);
+		n_estimados_MCSQ4_AES_Salidas_ahorro = n_estimados_MCSQ4_AES_Salidas - (float) listaIdentificadorObjetos_noUsadosEnXML.get(posicion).size()/8;		
+
+		objeto = "SD/Ubicacion=SD_Local/Tipo=SD_simple";
+		posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);
+		n_estimados_MCSQ4_AES_Salidas_ahorro = n_estimados_MCSQ4_AES_Salidas_ahorro - (float) listaIdentificadorObjetos_noUsadosEnXML.get(posicion).size()/8;
+		
+		
+		
+		
+		return 0;
+
+
 	}
 	
 	private int devuelveIndiceObjetoS3e(String nombreObjetoS3e) {
@@ -683,6 +777,7 @@ public class DatosFicheroXML {
 	private List<List<Integer>> obj_XML_Usados = new ArrayList<List<Integer>>();
 	
 	private List<List<String>> listaIdentificadorObjetos_noUsadosEnXML = new ArrayList<List<String>>();
+	private List<Integer> numero_Objetos_noUsadosEnXML = new ArrayList<Integer>();
 
 	private File fichero = new File("");
 	private File ficheroSicamPC = new File("");
@@ -698,6 +793,10 @@ public class DatosFicheroXML {
 	private float n_estimados_MCSQ4_AES_Entradas = 0;
 	private float n_estimados_MCSQ4_AES_Salidas = 0;
 	private float n_estimados_MCSQ4_AF = 0;
+
+	private float n_estimados_MCSQ4_AES_Entradas_ahorro = 0;
+	private float n_estimados_MCSQ4_AES_Salidas_ahorro = 0;
+	private float n_estimados_MCSQ4_AF_ahorro = 0;	
 	
 	private int n_estimados_Q4_FNR = 0;
 	private int n_estimados_Q4_FR = 0;
@@ -705,6 +804,5 @@ public class DatosFicheroXML {
 	private int n_estimados_Q4_ED = 0;	
 	private int n_estimados_Q4_AGelec = 0;
 	private int n_estimados_Q4_AGmec = 0;
-
 	
 }

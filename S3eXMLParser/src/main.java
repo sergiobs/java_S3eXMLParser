@@ -23,6 +23,7 @@ import java.sql.Timestamp;
 //            un criterio que puede ser de '=' o '!' (distinto). ASi es posible buscar por ejemplo
 //            objetos que cumplan que determinado argumento sea distinto de 65535
 //022 		* Se corrige el conteo de MCS 
+//				022.01 	* se restan los elementos NO-usados en el calculo de los MCS
 
 public class main {
 	
@@ -36,8 +37,8 @@ public class main {
 		int nivelTraza = 2;
 		
 		// indicamos la ruta donde vamos a buscar los xml o bien la recogemos de argumento 1
-		String rutaBase = "C:\\temp3";
-		//String rutaBase = "C:\\CAFs_SBS\\ENCE\\ramas\\ENCE_DESARROLLO\\SIST\\Validación\\Entorno\\";	
+		//String rutaBase = "C:\\temp3";
+		String rutaBase = "C:\\CAFs_SBS\\ENCE\\ramas\\ENCE_DESARROLLO\\SIST\\Validación\\Entorno\\";	
 		
 		if (argv.length> 0) {
 			rutaBase = argv[0];
@@ -52,6 +53,7 @@ public class main {
 		ficheroSalidaNombre_numMCS=ficheroSalidaNombre+"_numMCS";
 		
 		File ficheroSalida = new File(ruta.getAbsolutePath() + "\\analisisXML_"+ficheroSalidaNombre+".txt");		
+		File ficheroSalida_numMCS = new File(ruta.getAbsolutePath() + "\\analisisXML_"+	ficheroSalidaNombre_numMCS+".txt");
 //		if (ficheroSalida.exists()) {
 //			ficheroSalida.delete();
 //		}
@@ -59,8 +61,8 @@ public class main {
 		List<File> listaFicherosXML = new ArrayList<File>();
 		List<File> listaFicherosXML_validos = new ArrayList<File>();		
  		texto = "Buscando ficheros en " + rutaBase;
-		escribeResultados.escribe(texto+"\n", ficheroSalida, nivelTraza);		
-		listaFicherosXML = Archivos.listarArchivosXMLRecursivamente(ruta);	
+		escribeResultados.escribe(texto+"\n", ficheroSalida, nivelTraza);
+		listaFicherosXML = Archivos.listarArchivosXMLRecursivamente(ruta);
 		
 		texto = "1. ¿Calculamos elementos con Nombre repetidos en XML (s/n)?: ";		
 		escribeResultados.escribe(texto, ficheroSalida, nivelTraza);
@@ -115,7 +117,9 @@ public class main {
 			DatosFicheroXML datosFicheroXML = new DatosFicheroXML(listaFicherosXML_validos.get(indiceFichero)); 
    	    
 			texto="\n"+timestamp+" - " + indiceFichero+ " "+datosFicheroXML.getFichero()+"\n---------------------------------------------------------------------------------------------";			
-			escribeResultados.escribe(texto+"\n", ficheroSalida, nivelTraza);
+			escribeResultados.escribe(texto+"", ficheroSalida, nivelTraza);
+			texto=indiceFichero+ "\t"+datosFicheroXML.getFichero();
+			escribeResultados.escribe(texto+"", ficheroSalida_numMCS, 1);
 			
 			if (datosFicheroXML.getFicheroSicamPC() == null) {
 				texto="ERROR: No existe sicampc.xml";				
@@ -124,17 +128,7 @@ public class main {
 				    	    	
 	    	// llamamos a la funcion para que cuente los objetos del S3e del fichero
 			datosFicheroXML.cuentaObjetosS3e();		
-			
-			// sacamos lista de numero de cada objeto del S3e. (60 MCS, 100 ED, etc)
-			texto="*** Numero de objetos:\n" + datosFicheroXML.imprimelistaNumeroObjetosS3e();			
-			escribeResultados.escribe(texto+"\n", ficheroSalida, nivelTraza);	
 
-			// Estimamos MCS
-			datosFicheroXML.estimaMCS();
-			// Imprime Estimamos MCS
-			texto="*** Estimacion MCS:\n" + datosFicheroXML.imprimeMCS_Estimados();			
-			escribeResultados.escribe(texto+"\n", ficheroSalida, nivelTraza);
-			
 			
 			if (calculaNombreObjetosRepetidosEnXML) {
 				// llamamos a la funcion para que cuente los objetos del S3e del fichero 
@@ -142,17 +136,43 @@ public class main {
 				
 				// imprimimos solo los elementos repetidos por tipo
 				texto="*** Objetos repetidos:";				
-				escribeResultados.escribe(texto+"\n", ficheroSalida, nivelTraza);					
+				escribeResultados.escribe(texto+"\t", ficheroSalida, nivelTraza);					
 				texto="" + datosFicheroXML.imprimeListaNombreObjetosRepetidosEnXML();				
-				escribeResultados.escribe(texto+"\n", ficheroSalida, nivelTraza);
+				escribeResultados.escribe(texto+"\t", ficheroSalida, nivelTraza);
 			}
 				
 			if (calculaIdentificadorObjetos_noUsadosEnXML) {
-				texto="*** Elementos no usados:";				
+				texto="\n*** Elementos no usados:";				
 				escribeResultados.escribe(texto+"\n", ficheroSalida, nivelTraza);				
 				datosFicheroXML.calcula_Id_Objetos_UsadosS3e();					
 				texto=datosFicheroXML.imprime_Id_No_UsadosS3e();				
 				escribeResultados.escribe(texto+"\n", ficheroSalida, nivelTraza);				
+			}
+			
+			// sacamos lista de numero de cada objeto del S3e. (60 MCS, 100 ED, etc)
+			texto="*** Numero de objetos:\n" + datosFicheroXML.imprimelistaNumeroObjetosS3e();			
+			escribeResultados.escribe(texto+"\n", ficheroSalida, nivelTraza);	
+
+			// Estimamos MCS
+			if (datosFicheroXML.estimaMCS()==0) {
+				texto="*** Estimacion MCS:\n" + datosFicheroXML.imprimeMCS_Estimados();
+				escribeResultados.escribe(texto+"\n", ficheroSalida, nivelTraza);
+				texto=datosFicheroXML.imprimeMCS_Estimados_corto();
+				escribeResultados.escribe(texto+"", ficheroSalida_numMCS, 1);
+				
+				// si ademas hemos buscado los no usados, recalculamos la estimación
+				if (calculaIdentificadorObjetos_noUsadosEnXML) {
+					datosFicheroXML.estimaMCS_ahorro();
+					texto="*** Estimacion MCS, tras eliminar los repetidos:\n" + datosFicheroXML.imprimeMCS_EstimadosF();
+					escribeResultados.escribe(texto+"\n", ficheroSalida, nivelTraza);		
+					texto=datosFicheroXML.imprimeMCS_EstimadosF_corto();
+					escribeResultados.escribe(texto+"\n", ficheroSalida_numMCS, 1);
+				}
+				
+				
+			} else if(datosFicheroXML.estimaMCS()==-1) {
+				texto="*** ERROR en estimaMCS";
+				escribeResultados.escribe(texto+"\n", ficheroSalida, nivelTraza);
 			}
 			
 			if (calculaNombreObjetosRepetidosEnXML_usados_en_Scripts&&calculaNombreObjetosRepetidosEnXML) {
