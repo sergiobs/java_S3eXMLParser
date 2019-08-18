@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 
 public class Archivos {
@@ -72,6 +73,12 @@ public class Archivos {
 		}
 		return true;
 	}	
+	
+	
+	
+	
+
+	
 	
     public static String getExtension(String filename) {
         int index = filename.lastIndexOf('.');

@@ -319,17 +319,17 @@ public class DatosFicheroXML {
 	public String imprimeMCS_Estimados () {
 		String texto2print ="";
 		
-		texto2print+="MCS_FR: " + n_estimados_MCS_FR +	"\n" +					
-						"MCS_FNR: " + n_estimados_MCS_FNR +"\n" +
-						"MCS_FRI: " + n_estimados_MCS_FRI +"\n" +
-						"MCS_FNRI: " + n_estimados_MCS_FNRI +"\n" +
-						"MCS_ES: " + n_estimados_MCS_ES +"\n" +
-						"MCS_ESHD: " + n_estimados_MCS_ESHD +"\n" +
-						"MCS_(SD): " + n_estimados_MCS_SD;		
-		
-		texto2print+="\nMCS Focos: " + (n_estimados_MCS_FR +n_estimados_MCS_FNR+ n_estimados_MCS_FRI+ n_estimados_MCS_FNRI) +	"\n" +					
-				"MCS ES(por ED): " + (n_estimados_MCS_ES +n_estimados_MCS_ESHD) +  "\n" +
-				"MCS ES(por SD): " + (n_estimados_MCS_SD );
+//		texto2print+="MCS_FR: " + n_estimados_MCS_FR +	"\n" +					
+//						"MCS_FNR: " + n_estimados_MCS_FNR +"\n" +
+//						"MCS_FRI: " + n_estimados_MCS_FRI +"\n" +
+//						"MCS_FNRI: " + n_estimados_MCS_FNRI +"\n" +
+//						"MCS_ES: " + n_estimados_MCS_ES +"\n" +
+//						"MCS_ESHD: " + n_estimados_MCS_ESHD +"\n" +
+//						"MCS_(SD): " + n_estimados_MCS_SD;		
+//		
+//		texto2print+="\nMCS Focos: " + (n_estimados_MCS_FR +n_estimados_MCS_FNR+ n_estimados_MCS_FRI+ n_estimados_MCS_FNRI) +	"\n" +					
+//				"MCS ES(por ED): " + (n_estimados_MCS_ES +n_estimados_MCS_ESHD) +  "\n" +
+//				"MCS ES(por SD): " + (n_estimados_MCS_SD );
 		texto2print+="\nMCS Total: " + 
 				(n_estimados_MCS_FR +n_estimados_MCS_FNR+ n_estimados_MCS_FRI+ n_estimados_MCS_FNRI + n_estimados_MCS_ES +n_estimados_MCS_ESHD) +  " / " + 
 				(n_estimados_MCS_FR +n_estimados_MCS_FNR+ n_estimados_MCS_FRI+ n_estimados_MCS_FNRI + n_estimados_MCS_SD)+"\n";
@@ -486,42 +486,42 @@ public class DatosFicheroXML {
 		}
 	}
 	
-	public String buscaStringScript (String stringBuscar, File fileScript) {
-		String imprimeError ="";
-		try {
-			int apariciones = 0;
-			Scanner sc = new Scanner(fileScript);
-			String linea = "";
-			while (sc.hasNext()) {
-				linea = sc.nextLine();
-				if (    
-						linea.contains(" "+stringBuscar+" ")||
-						linea.contains(","+stringBuscar+",")||
-						linea.contains(","+stringBuscar+")")||
-						linea.contains("("+stringBuscar+",")||
-						
-						linea.contains("\""+stringBuscar+"\"")||
-						
-						linea.contains(" "+stringBuscar+",")||
-						linea.contains(","+stringBuscar+" ")||
-						linea.contains("("+stringBuscar+" ")||
-						linea.contains(" "+stringBuscar+")")
-
-						) {
-					apariciones++;
-					if (apariciones > 0) {						
-						imprimeError = "ERROR: Se usa elemento repetido (" + stringBuscar + ") en script: " + fileScript;
-					}						
-				}
-			}
-			sc.close();		
-							
-		} catch (IOException e) {
-			e.printStackTrace();
-			return  imprimeError+" " + e;
-		}
-		return  imprimeError;
-	}
+//	public String buscaStringScript (String stringBuscar, File fileScript) {
+//		String imprimeError ="";
+//		try {
+//			int apariciones = 0;
+//			Scanner sc = new Scanner(fileScript);
+//			String linea = "";
+//			while (sc.hasNext()) {
+//				linea = sc.nextLine();
+//				if (    
+//						linea.contains(" "+stringBuscar+" ")||
+//						linea.contains(","+stringBuscar+",")||
+//						linea.contains(","+stringBuscar+")")||
+//						linea.contains("("+stringBuscar+",")||
+//						
+//						linea.contains("\""+stringBuscar+"\"")||
+//						
+//						linea.contains(" "+stringBuscar+",")||
+//						linea.contains(","+stringBuscar+" ")||
+//						linea.contains("("+stringBuscar+" ")||
+//						linea.contains(" "+stringBuscar+")")
+//
+//						) {
+//					apariciones++;
+//					if (apariciones > 0) {						
+//						imprimeError = "ERROR: Se usa elemento repetido (" + stringBuscar + ") en script: " + fileScript;
+//					}						
+//				}
+//			}
+//			sc.close();		
+//							
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//			return  imprimeError+" " + e;
+//		}
+//		return  imprimeError;
+//	}
 	
 	public int estimaMCS() {
 		
