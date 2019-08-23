@@ -83,7 +83,11 @@ public class DatosFicheroXML {
 			lista_Obj_S3e_NOMBRE.add("MF/Ubicacion=MF_Local/TipoFoco=MF_noIntermApagado");
 			lista_Obj_S3e_NOMBRE.add("MF/Ubicacion=MF_Local/TipoFoco=MF_noIntermEncendido");
 			lista_Obj_S3e_NOMBRE.add("MF/Ubicacion=MF_Local/TipoFoco=MF_IntermApagado");
-			lista_Obj_S3e_NOMBRE.add("MF/Ubicacion=MF_Local/TipoFoco=MF_InterEncFijoReposo");	
+			lista_Obj_S3e_NOMBRE.add("MF/Ubicacion=MF_Local/TipoFoco=MF_InterEncFijoReposo");
+			lista_Obj_S3e_NOMBRE.add("TRMF/TipoFoco=MF_noIntermApagado");
+			lista_Obj_S3e_NOMBRE.add("TRMF/TipoFoco=MF_noIntermEncendido");
+			lista_Obj_S3e_NOMBRE.add("TRMF/TipoFoco=MF_IntermApagado");
+			lista_Obj_S3e_NOMBRE.add("TRMF/TipoFoco=MF_InterEncFijoReposo");
 			lista_Obj_S3e_NOMBRE.add("ED/Ubicacion=ED_Local/Tipo=ED_dobleHilo");
 			lista_Obj_S3e_NOMBRE.add("ED/Ubicacion=ED_Local/Tipo=ED_dobleConjugada");
 			lista_Obj_S3e_NOMBRE.add("ED/Ubicacion=ED_Local/Tipo=ED_simpleHilo");
@@ -430,6 +434,11 @@ public class DatosFicheroXML {
 	
 	public void calcula_Id_Objetos_UsadosS3e () {
 		for (int i=0;i<num_Obj_S3e;i++) {
+			/* "obj_XML_Usados" contendrá para cada tipo de objeto del s3e			 * 
+			 * 			 0: elemento no usado 
+			 * 			 1:	elemento usado por lo menos una vez
+			 * 			-1: no aplica (en los objetos excluidos del calculo)		  
+			 */ 
 			this.calcula_Id_Objetos_Usados_porTipo(lista_Obj_S3e_NOMBRE.get(i));
 		}		
 	}
@@ -443,23 +452,36 @@ public class DatosFicheroXML {
 	}
 	
 	public void calcula_Id_Objetos_Usados_porTipo (String tipoObjetoS3e) {
+		/* Esta función rellena la tabla "obj_XML_Usados" para cada tipo de objeto del s3e 
+		 * con el siguiente valor:
+		 * 			 0: elemento no usado 
+		 * 			 1:	elemento usado por lo menos una vez
+		 * 			-1: no aplica (en los objetos excluidos del calculo)		  
+		 */
+		
+		
 		int inTipoObjetoS3e = devuelveIndiceObjetoS3e(tipoObjetoS3e);		
 		try {
 			for (int inObjeto = 0; inObjeto<this.obj_XML_Id.get(inTipoObjetoS3e).size(); inObjeto++) {	
-				//primero los que se excluyen en este calculo por reducir tiempo de calculo
-				if (tipoObjetoS3e.contentEquals("MO") ||
-						tipoObjetoS3e.contentEquals("ED") ||
-						tipoObjetoS3e.contentEquals("SD") ||
-						tipoObjetoS3e.contentEquals("MF") ||
-						tipoObjetoS3e.contentEquals("MCS") ) {
-					this.obj_XML_Usados.get(inTipoObjetoS3e).add(0);
+
+				//primero los que se excluyen en este calculo por reducir tiempo de calculo				
+				this.obj_XML_Usados.get(inTipoObjetoS3e).add(0); //por defecto añadimos 0 = no usado
+				if (tipoObjetoS3e.contentEquals("MO") 						
+						|| tipoObjetoS3e.contentEquals("TRMF/TipoFoco=MF_noIntermApagado")
+						|| tipoObjetoS3e.contentEquals("TRMF/TipoFoco=MF_noIntermEncendido")
+						|| tipoObjetoS3e.contentEquals("TRMF/TipoFoco=MF_IntermApagado")
+						|| tipoObjetoS3e.contentEquals("TRMF/TipoFoco=MF_InterEncFijoReposo")
+						
+						// se excluyen los TRMF porque de hecho no se usan (no son llamados por otro objeto)
+						
+						//|| tipoObjetoS3e.contentEquals("xxx")
+						//|| tipoObjetoS3e.contentEquals("xxx") ...						
+						) {					
 					this.obj_XML_Usados.get(inTipoObjetoS3e).set(inObjeto, -1); // no aplica
 				} else {
 					int apariciones = 0;
 					Scanner sc = new Scanner(this.fichero);
 					String linea = "";
-					
-					this.obj_XML_Usados.get(inTipoObjetoS3e).add(0);
 					while (sc.hasNext()) {
 						linea = sc.nextLine();
 						if (linea.contains(this.obj_XML_Id.get(inTipoObjetoS3e).get(inObjeto))) {
@@ -586,6 +608,56 @@ public class DatosFicheroXML {
 			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
 			return -1;
 		}
+		
+		// TRMF ---------------------------------------------------------------
+		
+		objeto = "TRMF/TipoFoco=MF_noIntermApagado";
+		if(lista_Obj_S3e_NOMBRE.contains(objeto))
+		{
+			int posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);
+			n_estimados_MCS_FNR += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/4; 
+			n_estimados_Q4_FNR += lista_Obj_S3e_CANTIDAD.get(posicion);
+			n_estimados_MCSQ4_AF += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/8;
+		} else {
+			System.out.println("ERROR: para estimar MCS, debe tenerse en cuenta " +  objeto );
+			return -1;
+		}
+				
+		objeto = "TRMF/TipoFoco=MF_noIntermEncendido";
+		if(lista_Obj_S3e_NOMBRE.contains(objeto))
+		{
+			int posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);
+			n_estimados_MCS_FR += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/4;
+			n_estimados_Q4_FR += lista_Obj_S3e_CANTIDAD.get(posicion);
+			n_estimados_MCSQ4_AF += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/8;			
+		} else {
+			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
+			return -1;
+		}
+		
+		objeto = "TRMF/TipoFoco=MF_IntermApagado";
+		if(lista_Obj_S3e_NOMBRE.contains(objeto))
+		{
+			int posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);
+			n_estimados_MCS_FNRI += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/2;
+			n_estimados_Q4_FNR += lista_Obj_S3e_CANTIDAD.get(posicion);
+			n_estimados_MCSQ4_AF += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/8;
+		} else {
+			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
+			return -1;
+		}
+		objeto = "TRMF/TipoFoco=MF_InterEncFijoReposo";
+		if(lista_Obj_S3e_NOMBRE.contains(objeto))
+		{
+			int posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);			
+			n_estimados_MCS_FRI += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/2;
+			n_estimados_Q4_FR += lista_Obj_S3e_CANTIDAD.get(posicion);
+			n_estimados_MCSQ4_AF += (float) lista_Obj_S3e_CANTIDAD.get(posicion)/8;	
+		} else {
+			System.out.println("ERROR: debe tenerse en cuenta " +  objeto );
+			return -1;
+		}
+		
 		
 		// ------------------------------------------------------------------------------
 		
@@ -716,6 +788,8 @@ public class DatosFicheroXML {
 	
 public int estimaMCS_ahorro() {
 		String objeto; 		
+		
+		// MF -----------------------------------------------------------------------------
 		objeto = "MF/Ubicacion=MF_Local/TipoFoco=MF_noIntermApagado";
 		int posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);
 		n_estimados_MCSQ4_AF_ahorro = n_estimados_MCSQ4_AF - (float) listaIdentificadorObjetos_noUsadosEnXML.get(posicion).size()/8;
@@ -728,6 +802,28 @@ public int estimaMCS_ahorro() {
 		posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);
 		n_estimados_MCSQ4_AF_ahorro = n_estimados_MCSQ4_AF_ahorro - (float) listaIdentificadorObjetos_noUsadosEnXML.get(posicion).size()/8;
 
+		objeto = "MF/Ubicacion=MF_Local/TipoFoco=MF_InterEncFijoReposo";
+		posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);
+		n_estimados_MCSQ4_AF_ahorro = n_estimados_MCSQ4_AF_ahorro - (float) listaIdentificadorObjetos_noUsadosEnXML.get(posicion).size()/8;
+		
+		//TRMF ---------------------------------------------------------------------------
+		objeto = "TRMF/TipoFoco=MF_noIntermApagado";
+		posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);
+		n_estimados_MCSQ4_AF_ahorro = n_estimados_MCSQ4_AF_ahorro - (float) listaIdentificadorObjetos_noUsadosEnXML.get(posicion).size()/8;
+
+		objeto = "TRMF/TipoFoco=MF_noIntermEncendido";
+		posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);
+		n_estimados_MCSQ4_AF_ahorro = n_estimados_MCSQ4_AF_ahorro - (float) listaIdentificadorObjetos_noUsadosEnXML.get(posicion).size()/8;
+
+		objeto = "TRMF/TipoFoco=MF_IntermApagado";
+		posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);
+		n_estimados_MCSQ4_AF_ahorro = n_estimados_MCSQ4_AF_ahorro - (float) listaIdentificadorObjetos_noUsadosEnXML.get(posicion).size()/8;
+
+		objeto = "TRMF/TipoFoco=MF_InterEncFijoReposo";
+		posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);
+		n_estimados_MCSQ4_AF_ahorro = n_estimados_MCSQ4_AF_ahorro - (float) listaIdentificadorObjetos_noUsadosEnXML.get(posicion).size()/8;		
+
+		// ED -----------------------------------------------------------
 		objeto = "ED/Ubicacion=ED_Local/Tipo=ED_dobleHilo";
 		posicion = Listas.buscaEnLista(lista_Obj_S3e_NOMBRE, objeto);
 		n_estimados_MCSQ4_AES_Entradas_ahorro = n_estimados_MCSQ4_AES_Entradas - (float) listaIdentificadorObjetos_noUsadosEnXML.get(posicion).size()/40;

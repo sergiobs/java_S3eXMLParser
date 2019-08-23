@@ -25,7 +25,7 @@ import java.sql.Timestamp;
 //022 		* Se corrige el conteo de MCS 
 //				022.01 	* se restan los elementos NO-usados en el calculo de los MCS
 //023 		* Se hacen busquedas basicas en script
-
+//024 		* Se agregan los TRMF
 
 public class main {
 	
