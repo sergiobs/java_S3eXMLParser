@@ -75,11 +75,6 @@ public class Archivos {
 	}	
 	
 	
-	
-	
-
-	
-	
     public static String getExtension(String filename) {
         int index = filename.lastIndexOf('.');
         if (index == -1) {
@@ -87,7 +82,5 @@ public class Archivos {
         } else {
               return filename.substring(index + 1);
         }
-}
-
-	
+    }	
 }
