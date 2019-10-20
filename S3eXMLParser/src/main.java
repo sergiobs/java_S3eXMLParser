@@ -29,6 +29,8 @@ import java.sql.Timestamp;
 //              024.04 * Prueba sin cambios
 //025 		* Se simplifica main , creando MainFuncionesAcciones y MainFunciones
 //026 		* Crea opcion de comentar en el xml los elmentos del s3e no utilizados
+//				026.01 * Se renombra el fichero xml original con sufijo "_bck" y se guarda el fichero reducido 
+//						 con el nombre original
 
 public class main {
 	

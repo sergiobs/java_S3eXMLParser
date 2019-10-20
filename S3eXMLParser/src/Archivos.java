@@ -56,6 +56,10 @@ public class Archivos {
 			String linea = br.readLine();
 			String criterio = "";
 			linea = br.readLine();
+            if (br != null)
+                br.close();
+            if (fr != null)
+                fr.close();
 			
 			if (linea.length() > 15 ) 
 				criterio = linea.substring(0, 14);
@@ -67,6 +71,8 @@ public class Archivos {
 				return true;
 			} else 
 				return false;
+			
+			
 			
 		} catch (IOException e) {			
 			e.printStackTrace();

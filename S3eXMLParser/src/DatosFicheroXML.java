@@ -115,16 +115,24 @@ public class DatosFicheroXML {
 
 			
 			this.num_Obj_S3e = lista_Obj_S3e_NOMBRE.size();
+			
+	
+			
 			this.fichero = ficheroXML;
+			
+//			File fichero_original_mod = new File(fichero.getAbsolutePath()+"_mod");
+//			File fichero_original_bck = new File(fichero.getAbsolutePath()+"_bck");
+//			System.out.println(fichero.renameTo(fichero_original_bck));
+	
 			this.pathScriptsAutomaticos="";
 			this.pathSicamPCXML="";
 					
 			nombreFichero= fichero.getName();
 			
-			//localizamos el sicampc.xml		
+			//localizamos sicampc.xml		
 			pathSicamPCXML = fichero.getPath().substring(0, fichero.getPath().length() - nombreFichero.length())+"\\..\\..\\";
 			ficheroSicamPC = new File(pathSicamPCXML+"sicampc.xml");
-							
+					
 			// se crea una lista de numObjS3e elementos que contendra el numero de objetos de cada 
 			// tipo (numeroMCS, numeroED, numeroSD, ...).
 			// inicialmente todos con valor 0
@@ -327,18 +335,7 @@ public class DatosFicheroXML {
 	
 	public String imprimeMCS_Estimados () {
 		String texto2print ="";
-		
-//		texto2print+="MCS_FR: " + n_estimados_MCS_FR +	"\n" +					
-//						"MCS_FNR: " + n_estimados_MCS_FNR +"\n" +
-//						"MCS_FRI: " + n_estimados_MCS_FRI +"\n" +
-//						"MCS_FNRI: " + n_estimados_MCS_FNRI +"\n" +
-//						"MCS_ES: " + n_estimados_MCS_ES +"\n" +
-//						"MCS_ESHD: " + n_estimados_MCS_ESHD +"\n" +
-//						"MCS_(SD): " + n_estimados_MCS_SD;		
-//		
-//		texto2print+="\nMCS Focos: " + (n_estimados_MCS_FR +n_estimados_MCS_FNR+ n_estimados_MCS_FRI+ n_estimados_MCS_FNRI) +	"\n" +					
-//				"MCS ES(por ED): " + (n_estimados_MCS_ES +n_estimados_MCS_ESHD) +  "\n" +
-//				"MCS ES(por SD): " + (n_estimados_MCS_SD );
+
 		texto2print+="\nMCS Total: " + 
 				(n_estimados_MCS_FR +n_estimados_MCS_FNR+ n_estimados_MCS_FRI+ n_estimados_MCS_FNRI + n_estimados_MCS_ES +n_estimados_MCS_ESHD) +  " / " + 
 				(n_estimados_MCS_FR +n_estimados_MCS_FNR+ n_estimados_MCS_FRI+ n_estimados_MCS_FNRI + n_estimados_MCS_SD)+"\n";
@@ -464,9 +461,10 @@ public class DatosFicheroXML {
 	}
 	
 	public String borra_Objetos_NoUsadosS3e () {
+		
 		String texto2print ="";				
-		String aaa = fichero.getAbsolutePath()+"_mod";
-		File fichero_modificado = new File(aaa);
+		String fichero_nombre_modificado = fichero.getAbsolutePath()+"_mod";
+		File fichero_modificado = new File(fichero_nombre_modificado);
         if (!fichero_modificado.exists())
 			try {
 				fichero_modificado.createNewFile();
@@ -475,88 +473,83 @@ public class DatosFicheroXML {
 			}
 		else
         	fichero_modificado.delete();
- 		
-		try {			
-			Scanner sc = new Scanner(fichero);
-            FileWriter fw = new FileWriter(fichero_modificado.getAbsoluteFile(), true);
-        	BufferedWriter bw = new BufferedWriter(fw);            
-            //String string_a_buscar = ("<MF Identificador=\"7000\"");
-            
-            // para cada tipo de objeto del S3e
-//    		for (int i=0;i<num_Obj_S3e;i++) {
-//    			if (this.listaIdentificadorObjetos_noUsadosEnXML.get(i).size()>0) {
-//    				for (int aa=0; aa<this.listaIdentificadorObjetos_noUsadosEnXML.get(i).size();aa++) {
-//    					System.out.println("xxx: " + this.listaIdentificadorObjetos_noUsadosEnXML.get(i).get(aa));    					
-//    					System.out.println("Nombre: " + lista_Obj_S3e_NOMBRE.get(i));
-//    					
-//    					if (lista_Obj_S3e_NOMBRE.get(i)=="ED") {
-//    						String string_a_buscar = "<"+lista_Obj_S3e_NOMBRE.get(i)+" Identificador=\"" + 
-//    								this.listaIdentificadorObjetos_noUsadosEnXML.get(i).get(aa) + "\"";
-//    						System.out.println("string_a_buscar: " + string_a_buscar);
-//    						String linea = "";
-//    						String linea_nueva = "";
-//    						while (sc.hasNext()) {
-//    							linea = sc.nextLine();				
-//    							if (linea.contains(string_a_buscar)) 					
-//    								linea_nueva = "<!--" + linea + "-->";			
-//    							else 
-//    								linea_nueva = linea;				
-//    							bw.write(linea_nueva+"\r\n");       						
-//    						}   					
-// 					
-//						}
-//    				}
-//    			}
-        	
-    		while (sc.hasNext()) {
-				String linea = "";
-				String linea_nueva = "";					
-				linea = sc.nextLine();	
-				boolean lineaProcesada = false;
-									
-				for (int i=0;i<num_Obj_S3e;i++) {
-					if ((lista_Obj_S3e_NOMBRE.get(i)=="ED") ||
-							(lista_Obj_S3e_NOMBRE.get(i)=="SD") ||
-							(lista_Obj_S3e_NOMBRE.get(i)=="MF") ||
-							(lista_Obj_S3e_NOMBRE.get(i)=="MA") ||
-							(lista_Obj_S3e_NOMBRE.get(i)=="MM")) {
-			
-						if (this.listaIdentificadorObjetos_noUsadosEnXML.get(i).size()>0) {
-							for (int aa=0; aa<this.listaIdentificadorObjetos_noUsadosEnXML.get(i).size();aa++) {								
-								//if (lista_Obj_S3e_NOMBRE.get(i)=="ED") {
-									String string_a_buscar = "<"+lista_Obj_S3e_NOMBRE.get(i)+" Identificador=\"" + 
-											this.listaIdentificadorObjetos_noUsadosEnXML.get(i).get(aa) + "\"";
-									
-									if (linea.contains(string_a_buscar)) { 	
-										lineaProcesada = true;
-										linea_nueva = "<!--" + linea + "-->";			
-										break;
-									}
-									else {
-										//comentaLinea = false;
-										linea_nueva = linea;
-									}
-								//}
-								if (lineaProcesada) break;
-							}						
-						}	
-						if (lineaProcesada) break;
-					}
-	    		}				
-				bw.write(linea_nueva+"\r\n");
-				
-    		}
+        
+        
+        //primero se determina si sobran elementos
+        boolean sobranElementos = true;
+        for (int i=0;i<num_Obj_S3e;i++) {
+        	if (listaIdentificadorObjetos_noUsadosEnXML.get(i).size()>0) {
+        		sobranElementos = true;
+        	}
+        }
 
-            if (bw != null)
-                bw.close();
-            if (fw != null)
-                fw.close();
+        
+ 		if (sobranElementos) {
 			
-			sc.close();							
-		} catch (IOException e) {
-			e.printStackTrace();
-			//return  imprimeError+" " + e;
-		}		
+			try {			
+				Scanner sc = new Scanner(fichero);
+	            FileWriter fw = new FileWriter(fichero_modificado.getAbsoluteFile(), true);
+	        	BufferedWriter bw = new BufferedWriter(fw);            
+	 
+	    		while (sc.hasNext()) {
+					String linea = "";
+					String linea_nueva = "";					
+					linea = sc.nextLine();	
+					boolean lineaProcesada = false;
+										
+					for (int i=0;i<num_Obj_S3e;i++) {
+						if ((lista_Obj_S3e_NOMBRE.get(i)=="ED") ||
+								(lista_Obj_S3e_NOMBRE.get(i)=="SD") ||
+								(lista_Obj_S3e_NOMBRE.get(i)=="MF") ||
+								(lista_Obj_S3e_NOMBRE.get(i)=="MA") ||
+								(lista_Obj_S3e_NOMBRE.get(i)=="MM")) {
+				
+							if (this.listaIdentificadorObjetos_noUsadosEnXML.get(i).size()>0) {
+								for (int aa=0; aa<this.listaIdentificadorObjetos_noUsadosEnXML.get(i).size();aa++) {								
+									//if (lista_Obj_S3e_NOMBRE.get(i)=="ED") {
+										String string_a_buscar = "<"+lista_Obj_S3e_NOMBRE.get(i)+" Identificador=\"" + 
+												this.listaIdentificadorObjetos_noUsadosEnXML.get(i).get(aa) + "\"";
+										
+										if (linea.contains(string_a_buscar)) { 	
+											lineaProcesada = true;
+											linea_nueva = "<!--" + linea + "-->";			
+											break;
+										}
+										else {
+											//comentaLinea = false;
+											linea_nueva = linea;
+										}
+									//}
+									if (lineaProcesada) break;
+								}						
+							}	
+							if (lineaProcesada) break;
+						}
+		    		}				
+					bw.write(linea_nueva+"\r\n");
+					
+	    		}
+	
+	            if (bw != null)
+	                bw.close();
+	            if (fw != null)
+	                fw.close();
+				sc.close();	
+				
+	 						
+			} catch (IOException e) {
+				e.printStackTrace();
+				//return  imprimeError+" " + e;
+			}	  
+			
+			// se renombran ficheros
+			File fichero_original_bck = new File(fichero.getAbsolutePath()+"_bck");			
+			System.out.println(fichero.renameTo(fichero_original_bck));						
+			System.out.println(fichero_modificado.renameTo(fichero));
+			
+ 		}
+        
+        
 	return texto2print;
 	}
 	
@@ -620,43 +613,7 @@ public class DatosFicheroXML {
 		
 	}
 	
-//	public String buscaStringScript (String stringBuscar, File fileScript) {
-//		String imprimeError ="";
-//		try {
-//			int apariciones = 0;
-//			Scanner sc = new Scanner(fileScript);
-//			String linea = "";
-//			while (sc.hasNext()) {
-//				linea = sc.nextLine();
-//				if (    
-//						linea.contains(" "+stringBuscar+" ")||
-//						linea.contains(","+stringBuscar+",")||
-//						linea.contains(","+stringBuscar+")")||
-//						linea.contains("("+stringBuscar+",")||
-//						
-//						linea.contains("\""+stringBuscar+"\"")||
-//						
-//						linea.contains(" "+stringBuscar+",")||
-//						linea.contains(","+stringBuscar+" ")||
-//						linea.contains("("+stringBuscar+" ")||
-//						linea.contains(" "+stringBuscar+")")
-//
-//						) {
-//					apariciones++;
-//					if (apariciones > 0) {						
-//						imprimeError = "ERROR: Se usa elemento repetido (" + stringBuscar + ") en script: " + fileScript;
-//					}						
-//				}
-//			}
-//			sc.close();		
-//							
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//			return  imprimeError+" " + e;
-//		}
-//		return  imprimeError;
-//	}
-	
+
 	public int estimaMCS() {
 		
 		// Consideraciones Q4e:

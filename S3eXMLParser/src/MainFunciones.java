@@ -113,7 +113,9 @@ public class MainFunciones {
 
 		String texto = "Entramos en tratarXML";
 		escribeResultados.escribe(texto+"\n", ficheroSalida, nivelTraza);
+		
 
+		
 				
 		int elementosRepesUsadosTotal=0;				
 		// bucle para procesar cada objeto contenido en el array de listaDatosFicheroXML			
@@ -122,6 +124,8 @@ public class MainFunciones {
 			
 			DatosFicheroXML datos_ficheroXML_bajo_test = new DatosFicheroXML(listaFicherosXML_validos.get(indiceFichero)); 
    	    
+
+			
 			texto="\n"+timestamp+" - " + indiceFichero+ " "+datos_ficheroXML_bajo_test.getFichero()+"\n---------------------------------------------------------------------------------------------";			
 			escribeResultados.escribe(texto+"", ficheroSalida, nivelTraza);
 			texto=indiceFichero+ "\t"+datos_ficheroXML_bajo_test.getFichero();
@@ -159,8 +163,6 @@ public class MainFunciones {
 				escribeResultados.escribe(texto+"\n", ficheroSalida, nivelTraza);
 				// parto de una lista de elementos no usados en el xml (ignoro los MCS de momento).				
 				datos_ficheroXML_bajo_test.borra_Objetos_NoUsadosS3e();	
-				
-			
 			}
 			
 			// sacamos lista de numero de cada objeto del S3e. (60 MCS, 100 ED, etc)
