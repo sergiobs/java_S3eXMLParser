@@ -1,6 +1,8 @@
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -77,6 +79,8 @@ public class DatosFicheroXML {
 	// constructor
 		public DatosFicheroXML (File ficheroXML) {
 			
+			// Activar para dimensionar 
+			/*
 			lista_Obj_S3e_NOMBRE.add("MCS/TipoDeMCS=MCS_focos");
 			lista_Obj_S3e_NOMBRE.add("MCS/TipoDeMCS=MCS_ESgeneral");
 			lista_Obj_S3e_NOMBRE.add("MCS/TipoDeMCS=MCS_ES_hiloDoble");
@@ -98,17 +102,17 @@ public class DatosFicheroXML {
 			lista_Obj_S3e_NOMBRE.add("MA/IdentMCSDR!65535");
 			lista_Obj_S3e_NOMBRE.add("MA");
 			lista_Obj_S3e_NOMBRE.add("MM");
+			*/
+			//--------------------------------
 
 			
-			// Activar estos solo para buscar elementos no usados o duplicados, no para dimensionar MCS
-			//listaNombreObjetosS3e.add("PV");
-			//lista_Obj_S3e_NOMBRE.add("SE");
-			//lista_Obj_S3e_NOMBRE.add("CV");
-			//lista_Obj_S3e_NOMBRE.add("AG");
-			//lista_Obj_S3e_NOMBRE.add("MO");
-			//lista_Obj_S3e_NOMBRE.add("ML");
-			//lista_Obj_S3e_NOMBRE.add("IF");
-			//lista_Obj_S3e_NOMBRE.add("IS");
+			// Activar estos solo para elementos no usados 
+			lista_Obj_S3e_NOMBRE.add("ED");
+			lista_Obj_S3e_NOMBRE.add("SD");
+			lista_Obj_S3e_NOMBRE.add("MF");
+			lista_Obj_S3e_NOMBRE.add("MA");
+			lista_Obj_S3e_NOMBRE.add("MM");
+
 			
 			this.num_Obj_S3e = lista_Obj_S3e_NOMBRE.size();
 			this.fichero = ficheroXML;
@@ -121,7 +125,8 @@ public class DatosFicheroXML {
 			pathSicamPCXML = fichero.getPath().substring(0, fichero.getPath().length() - nombreFichero.length())+"\\..\\..\\";
 			ficheroSicamPC = new File(pathSicamPCXML+"sicampc.xml");
 							
-			// se crea una lista de numObjS3e elementos que contendra el numero de objetos de cada tipo (numeroMCS, numeroED, numeroSD, )
+			// se crea una lista de numObjS3e elementos que contendra el numero de objetos de cada 
+			// tipo (numeroMCS, numeroED, numeroSD, ...).
 			// inicialmente todos con valor 0
 			for (int i=0; i<num_Obj_S3e; i++) 
 				this.lista_Obj_S3e_CANTIDAD.add(0);
@@ -404,7 +409,7 @@ public class DatosFicheroXML {
 		return texto2print;
 	}	
 	
-	public String imprimeIdentificadorObjetoNoUsados (String tipoObjetoS3e) {
+	public String imprime_IdObjetoNoUsados_porTipo (String tipoObjetoS3e) {
 		int inTipoObjetoS3e = devuelveIndiceObjetoS3e(tipoObjetoS3e);
 		String texto2print ="";
 		
@@ -417,6 +422,11 @@ public class DatosFicheroXML {
 		}
 		return texto2print;
 	}	
+	
+	public void borra_Objetos_NoUsados_porTipo (String tipoObjetoS3e) {
+	
+	}	
+	
 	
 	public void calculaNombreObjetosRepetidosS3e () {
 		List<String> listaDevueltaConRepetidos = new ArrayList<String>();
@@ -439,19 +449,118 @@ public class DatosFicheroXML {
 			 * 			 1:	elemento usado por lo menos una vez
 			 * 			-1: no aplica (en los objetos excluidos del calculo)		  
 			 */ 
-			this.calcula_Id_Objetos_Usados_porTipo(lista_Obj_S3e_NOMBRE.get(i));
-		}		
+			this.calcula_nivel_utilizacion_TipoObjetosS3e(lista_Obj_S3e_NOMBRE.get(i));
+		}
+		
+		System.out.println("listaIdentificadorObjetos_noUsadosEnXML: " +  listaIdentificadorObjetos_noUsadosEnXML );
 	}
 	
-	public String imprime_Id_No_UsadosS3e () {
+	public String imprime_Objetos_NoUsadosS3e () {
 		String texto2print ="";		
 		for (int i=0;i<num_Obj_S3e;i++) {
-			texto2print+=this.imprimeIdentificadorObjetoNoUsados(lista_Obj_S3e_NOMBRE.get(i));
+			texto2print+=this.imprime_IdObjetoNoUsados_porTipo(lista_Obj_S3e_NOMBRE.get(i));
 		}	
 		return texto2print;
 	}
 	
-	public void calcula_Id_Objetos_Usados_porTipo (String tipoObjetoS3e) {
+	public String borra_Objetos_NoUsadosS3e () {
+		String texto2print ="";				
+		String aaa = fichero.getAbsolutePath()+"_mod";
+		File fichero_modificado = new File(aaa);
+        if (!fichero_modificado.exists())
+			try {
+				fichero_modificado.createNewFile();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		else
+        	fichero_modificado.delete();
+ 		
+		try {			
+			Scanner sc = new Scanner(fichero);
+            FileWriter fw = new FileWriter(fichero_modificado.getAbsoluteFile(), true);
+        	BufferedWriter bw = new BufferedWriter(fw);            
+            //String string_a_buscar = ("<MF Identificador=\"7000\"");
+            
+            // para cada tipo de objeto del S3e
+//    		for (int i=0;i<num_Obj_S3e;i++) {
+//    			if (this.listaIdentificadorObjetos_noUsadosEnXML.get(i).size()>0) {
+//    				for (int aa=0; aa<this.listaIdentificadorObjetos_noUsadosEnXML.get(i).size();aa++) {
+//    					System.out.println("xxx: " + this.listaIdentificadorObjetos_noUsadosEnXML.get(i).get(aa));    					
+//    					System.out.println("Nombre: " + lista_Obj_S3e_NOMBRE.get(i));
+//    					
+//    					if (lista_Obj_S3e_NOMBRE.get(i)=="ED") {
+//    						String string_a_buscar = "<"+lista_Obj_S3e_NOMBRE.get(i)+" Identificador=\"" + 
+//    								this.listaIdentificadorObjetos_noUsadosEnXML.get(i).get(aa) + "\"";
+//    						System.out.println("string_a_buscar: " + string_a_buscar);
+//    						String linea = "";
+//    						String linea_nueva = "";
+//    						while (sc.hasNext()) {
+//    							linea = sc.nextLine();				
+//    							if (linea.contains(string_a_buscar)) 					
+//    								linea_nueva = "<!--" + linea + "-->";			
+//    							else 
+//    								linea_nueva = linea;				
+//    							bw.write(linea_nueva+"\r\n");       						
+//    						}   					
+// 					
+//						}
+//    				}
+//    			}
+        	
+    		while (sc.hasNext()) {
+				String linea = "";
+				String linea_nueva = "";					
+				linea = sc.nextLine();	
+				boolean lineaProcesada = false;
+									
+				for (int i=0;i<num_Obj_S3e;i++) {
+					if ((lista_Obj_S3e_NOMBRE.get(i)=="ED") ||
+							(lista_Obj_S3e_NOMBRE.get(i)=="SD") ||
+							(lista_Obj_S3e_NOMBRE.get(i)=="MF") ||
+							(lista_Obj_S3e_NOMBRE.get(i)=="MA") ||
+							(lista_Obj_S3e_NOMBRE.get(i)=="MM")) {
+			
+						if (this.listaIdentificadorObjetos_noUsadosEnXML.get(i).size()>0) {
+							for (int aa=0; aa<this.listaIdentificadorObjetos_noUsadosEnXML.get(i).size();aa++) {								
+								//if (lista_Obj_S3e_NOMBRE.get(i)=="ED") {
+									String string_a_buscar = "<"+lista_Obj_S3e_NOMBRE.get(i)+" Identificador=\"" + 
+											this.listaIdentificadorObjetos_noUsadosEnXML.get(i).get(aa) + "\"";
+									
+									if (linea.contains(string_a_buscar)) { 	
+										lineaProcesada = true;
+										linea_nueva = "<!--" + linea + "-->";			
+										break;
+									}
+									else {
+										//comentaLinea = false;
+										linea_nueva = linea;
+									}
+								//}
+								if (lineaProcesada) break;
+							}						
+						}	
+						if (lineaProcesada) break;
+					}
+	    		}				
+				bw.write(linea_nueva+"\r\n");
+				
+    		}
+
+            if (bw != null)
+                bw.close();
+            if (fw != null)
+                fw.close();
+			
+			sc.close();							
+		} catch (IOException e) {
+			e.printStackTrace();
+			//return  imprimeError+" " + e;
+		}		
+	return texto2print;
+	}
+	
+	public void calcula_nivel_utilizacion_TipoObjetosS3e (String tipoObjetoS3e) {
 		/* Esta función rellena la tabla "obj_XML_Usados" para cada tipo de objeto del s3e 
 		 * con el siguiente valor:
 		 * 			 0: elemento no usado 
@@ -506,6 +615,9 @@ public class DatosFicheroXML {
 					.add(this.obj_XML_Id.get(inTipoObjetoS3e).get(inObjeto));				
 			}
 		}
+		//System.out.println("_: " +  listaIdentificadorObjetos_noUsadosEnXML );
+		
+		
 	}
 	
 //	public String buscaStringScript (String stringBuscar, File fileScript) {

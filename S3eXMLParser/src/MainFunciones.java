@@ -1,7 +1,12 @@
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class MainFunciones {
 
@@ -27,11 +32,60 @@ public class MainFunciones {
     	if (apariciones>0){
     		texto = "Apariciones de " + string_a_buscar + ": " + apariciones_total;
     		escribeResultados.escribe(texto+"\n", ficheroSalida, nivelTraza);	
-    	}
-    	
+    	}    	
     }
     
-    static void tratarXML(String rutaBase, int nivelTraza, File ficheroSalida, File ficheroSalida_numMCS, File ruta, Boolean calculaNombreObjetosRepetidosEnXML, Boolean calculaIdentificadorObjetos_noUsadosEnXML, Boolean calculaNombreObjetosRepetidosEnXML_usados_en_Scripts){
+    static void borra_noUsados_enPruebas(String rutaBase, int nivelTraza, File ruta){
+// 		File fichero_original = new File("c:\\temp\\CC100ESP.xml"); 		
+// 		File fichero_modificado = new File("c:\\temp\\CC100ESP_modificado.xml");  		
+//
+//		if (fichero_modificado.exists()) {
+//			fichero_modificado.delete();
+//		}
+// 		
+//		String string_a_buscar = ("<MF Identificador=\"7000\"");
+//
+//		
+//		try {			
+//			Scanner sc = new Scanner(fichero_original);
+//        	BufferedWriter bw = null;
+//            FileWriter fw = null;
+//            
+//            if (!fichero_modificado.exists()) {
+//            	fichero_modificado.createNewFile();
+//            }
+//            fw = new FileWriter(fichero_modificado.getAbsoluteFile(), true);
+//            bw = new BufferedWriter(fw);
+//            
+//			
+//			String linea = "";
+//			//String nuevo_texto_total =""; //contendra el nuevo fichero xml
+//			String linea_nueva = "";
+//			while (sc.hasNext()) {
+//				linea = sc.nextLine();				
+//				if (linea.contains(string_a_buscar)) 					
+//					linea_nueva = "<!--" + linea + "-->";			
+//				else 
+//					linea_nueva = linea;				
+//				bw.write(linea_nueva+"\r\n");
+//			}		
+//
+//            if (bw != null)
+//                bw.close();
+//            if (fw != null)
+//                fw.close();
+//			
+//			sc.close();							
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//			//return  imprimeError+" " + e;
+//		}
+//		
+//		
+	   	
+    }
+ 
+    static List<File>  calculaListaFicherosXML_validos(String rutaBase, int nivelTraza, File ficheroSalida, File ruta){
 		List<File> listaFicherosXML = new ArrayList<File>();
 		List<File> listaFicherosXML_validos = new ArrayList<File>();		
 		String texto = "Buscando ficheros en " + rutaBase;
@@ -51,6 +105,15 @@ public class MainFunciones {
 				escribeResultados.escribe(texto+"\n", ficheroSalida, nivelTraza);
 			}
 		}
+		return listaFicherosXML_validos;
+    }
+    
+    
+    static void tratar_cada_XML(int nivelTraza, File ficheroSalida, File ficheroSalida_numMCS, File ruta, List<File> listaFicherosXML_validos, Boolean calculaNombreObjetosRepetidosEnXML, Boolean calculaIdentificadorObjetos_noUsadosEnXML, Boolean borraObjetos_noUsadosEnXML, Boolean calculaNombreObjetosRepetidosEnXML_usados_en_Scripts, Boolean estimaMCS){
+
+		String texto = "Entramos en tratarXML";
+		escribeResultados.escribe(texto+"\n", ficheroSalida, nivelTraza);
+
 				
 		int elementosRepesUsadosTotal=0;				
 		// bucle para procesar cada objeto contenido en el array de listaDatosFicheroXML			
@@ -74,7 +137,6 @@ public class MainFunciones {
 
 			
 			if (calculaNombreObjetosRepetidosEnXML) {
-				// llamamos a la funcion para que cuente los objetos del S3e del fichero 
 				datos_ficheroXML_bajo_test.calculaNombreObjetosRepetidosS3e();
 				
 				// imprimimos solo los elementos repetidos por tipo
@@ -88,8 +150,17 @@ public class MainFunciones {
 				texto="\n*** Elementos no usados:";				
 				escribeResultados.escribe(texto+"\n", ficheroSalida, nivelTraza);				
 				datos_ficheroXML_bajo_test.calcula_Id_Objetos_UsadosS3e();					
-				texto=datos_ficheroXML_bajo_test.imprime_Id_No_UsadosS3e();				
+				texto=datos_ficheroXML_bajo_test.imprime_Objetos_NoUsadosS3e();				
 				escribeResultados.escribe(texto+"\n", ficheroSalida, nivelTraza);				
+			}
+
+			if (borraObjetos_noUsadosEnXML) {
+				texto="\n*** Borra Elementos no usados:";				
+				escribeResultados.escribe(texto+"\n", ficheroSalida, nivelTraza);
+				// parto de una lista de elementos no usados en el xml (ignoro los MCS de momento).				
+				datos_ficheroXML_bajo_test.borra_Objetos_NoUsadosS3e();	
+				
+			
 			}
 			
 			// sacamos lista de numero de cada objeto del S3e. (60 MCS, 100 ED, etc)
@@ -97,25 +168,27 @@ public class MainFunciones {
 			escribeResultados.escribe(texto+"\n", ficheroSalida, nivelTraza);	
 
 			// Estimamos MCS
-			if (datos_ficheroXML_bajo_test.estimaMCS()==0) {
-				texto="*** Estimacion MCS:\n" + datos_ficheroXML_bajo_test.imprimeMCS_Estimados();
-				escribeResultados.escribe(texto+"\n", ficheroSalida, nivelTraza);
-				texto=datos_ficheroXML_bajo_test.imprimeMCS_Estimados_corto();
-				escribeResultados.escribe(texto+"", ficheroSalida_numMCS, 1);
-				
-				// si ademas hemos buscado los no usados, recalculamos la estimación
-				if (calculaIdentificadorObjetos_noUsadosEnXML) {
-					datos_ficheroXML_bajo_test.estimaMCS_ahorro();
-					texto="*** Estimacion MCS, tras eliminar los repetidos:\n" + datos_ficheroXML_bajo_test.imprimeMCS_EstimadosF();
-					escribeResultados.escribe(texto+"\n", ficheroSalida, nivelTraza);		
-					texto=datos_ficheroXML_bajo_test.imprimeMCS_EstimadosF_corto();
-					escribeResultados.escribe(texto+"\n", ficheroSalida_numMCS, 1);
+			if (estimaMCS) {
+				if (datos_ficheroXML_bajo_test.estimaMCS()==0) {
+					texto="*** Estimacion MCS:\n" + datos_ficheroXML_bajo_test.imprimeMCS_Estimados();
+					escribeResultados.escribe(texto+"\n", ficheroSalida, nivelTraza);
+					texto=datos_ficheroXML_bajo_test.imprimeMCS_Estimados_corto();
+					escribeResultados.escribe(texto+"", ficheroSalida_numMCS, 1);
+					
+					// si ademas hemos buscado los no usados, recalculamos la estimación
+					if (calculaIdentificadorObjetos_noUsadosEnXML) {
+						datos_ficheroXML_bajo_test.estimaMCS_ahorro();
+						texto="*** Estimacion MCS, tras eliminar los repetidos:\n" + datos_ficheroXML_bajo_test.imprimeMCS_EstimadosF();
+						escribeResultados.escribe(texto+"\n", ficheroSalida, nivelTraza);		
+						texto=datos_ficheroXML_bajo_test.imprimeMCS_EstimadosF_corto();
+						escribeResultados.escribe(texto+"\n", ficheroSalida_numMCS, 1);
+					}
+					
+					
+				} else if(datos_ficheroXML_bajo_test.estimaMCS()==-1) {
+					texto="*** ERROR en estimaMCS";
+					escribeResultados.escribe(texto+"\n", ficheroSalida, nivelTraza);
 				}
-				
-				
-			} else if(datos_ficheroXML_bajo_test.estimaMCS()==-1) {
-				texto="*** ERROR en estimaMCS";
-				escribeResultados.escribe(texto+"\n", ficheroSalida, nivelTraza);
 			}
 			
 			if (calculaNombreObjetosRepetidosEnXML_usados_en_Scripts&&calculaNombreObjetosRepetidosEnXML) {
