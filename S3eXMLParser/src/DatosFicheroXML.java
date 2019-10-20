@@ -112,17 +112,9 @@ public class DatosFicheroXML {
 			lista_Obj_S3e_NOMBRE.add("MF");
 			lista_Obj_S3e_NOMBRE.add("MA");
 			lista_Obj_S3e_NOMBRE.add("MM");
-
 			
-			this.num_Obj_S3e = lista_Obj_S3e_NOMBRE.size();
-			
-	
-			
+			this.num_Obj_S3e = lista_Obj_S3e_NOMBRE.size();	
 			this.fichero = ficheroXML;
-			
-//			File fichero_original_mod = new File(fichero.getAbsolutePath()+"_mod");
-//			File fichero_original_bck = new File(fichero.getAbsolutePath()+"_bck");
-//			System.out.println(fichero.renameTo(fichero_original_bck));
 	
 			this.pathScriptsAutomaticos="";
 			this.pathSicamPCXML="";
@@ -460,31 +452,29 @@ public class DatosFicheroXML {
 		return texto2print;
 	}
 	
-	public String borra_Objetos_NoUsadosS3e () {
-		
+	public String borra_Objetos_NoUsadosS3e () {		
 		String texto2print ="";				
-		String fichero_nombre_modificado = fichero.getAbsolutePath()+"_mod";
-		File fichero_modificado = new File(fichero_nombre_modificado);
-        if (!fichero_modificado.exists())
-			try {
-				fichero_modificado.createNewFile();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-		else
-        	fichero_modificado.delete();
-        
-        
+		        
         //primero se determina si sobran elementos
-        boolean sobranElementos = true;
+        boolean sobranElementos = false;
         for (int i=0;i<num_Obj_S3e;i++) {
         	if (listaIdentificadorObjetos_noUsadosEnXML.get(i).size()>0) {
         		sobranElementos = true;
         	}
         }
-
         
  		if (sobranElementos) {
+ 			
+ 			String fichero_nombre_modificado = fichero.getAbsolutePath()+".mod";
+ 			File fichero_modificado = new File(fichero_nombre_modificado);
+ 	        if (!fichero_modificado.exists())
+ 				try {
+ 					fichero_modificado.createNewFile();
+ 				} catch (IOException e1) {
+ 					e1.printStackTrace();
+ 				}
+ 			else
+ 	        	fichero_modificado.delete();
 			
 			try {			
 				Scanner sc = new Scanner(fichero);
@@ -512,7 +502,8 @@ public class DatosFicheroXML {
 										
 										if (linea.contains(string_a_buscar)) { 	
 											lineaProcesada = true;
-											linea_nueva = "<!--" + linea + "-->";			
+											//linea_nueva = "<!--" + linea + "-->";
+											linea_nueva = "";
 											break;
 										}
 										else {
@@ -543,7 +534,7 @@ public class DatosFicheroXML {
 			}	  
 			
 			// se renombran ficheros
-			File fichero_original_bck = new File(fichero.getAbsolutePath()+"_bck");			
+			File fichero_original_bck = new File(fichero.getAbsolutePath()+".bck");			
 			System.out.println(fichero.renameTo(fichero_original_bck));						
 			System.out.println(fichero_modificado.renameTo(fichero));
 			
