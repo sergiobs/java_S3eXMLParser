@@ -31,6 +31,7 @@ import java.sql.Timestamp;
 //026 		* Crea opcion de comentar en el xml los elmentos del s3e no utilizados
 //				026.01 * Se renombra el fichero xml original con sufijo "_bck" y se guarda el fichero reducido 
 //						 con el nombre original
+//027 		* Se mejora la busqueda de elementos no usados teniendo en cuenta ""
 
 public class main {
 	

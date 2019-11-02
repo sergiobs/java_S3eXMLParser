@@ -80,8 +80,8 @@ public class DatosFicheroXML {
 		public DatosFicheroXML (File ficheroXML) {
 			
 			// Activar para dimensionar 
-			/*
-			lista_Obj_S3e_NOMBRE.add("MCS/TipoDeMCS=MCS_focos");
+		
+			/*lista_Obj_S3e_NOMBRE.add("MCS/TipoDeMCS=MCS_focos");
 			lista_Obj_S3e_NOMBRE.add("MCS/TipoDeMCS=MCS_ESgeneral");
 			lista_Obj_S3e_NOMBRE.add("MCS/TipoDeMCS=MCS_ES_hiloDoble");
 			lista_Obj_S3e_NOMBRE.add("MF/Ubicacion=MF_Local/TipoFoco=MF_noIntermApagado");
@@ -102,7 +102,7 @@ public class DatosFicheroXML {
 			lista_Obj_S3e_NOMBRE.add("MA/IdentMCSDR!65535");
 			lista_Obj_S3e_NOMBRE.add("MA");
 			lista_Obj_S3e_NOMBRE.add("MM");
-			*/
+		*/
 			//--------------------------------
 
 			
@@ -577,7 +577,7 @@ public class DatosFicheroXML {
 					String linea = "";
 					while (sc.hasNext()) {
 						linea = sc.nextLine();
-						if (linea.contains(this.obj_XML_Id.get(inTipoObjetoS3e).get(inObjeto))) {
+						if (linea.contains("\""+this.obj_XML_Id.get(inTipoObjetoS3e).get(inObjeto)+"\"")) {
 							apariciones++;
 							if (apariciones > 1) {
 								this.obj_XML_Usados.get(inTipoObjetoS3e).set(inObjeto, 1);
