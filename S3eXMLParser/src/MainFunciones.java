@@ -13,7 +13,7 @@ public class MainFunciones {
 	
     static void cuentaMCS_enScripts(String rutaBase, int nivelTraza, File ficheroSalida, File ruta){
     	List<File> listaFicherosSCRIPT = new ArrayList<File>();
- 		String texto = "Buscando scripts en " + rutaBase;
+ 		String texto = "cuentaMCS_enScripts: Buscando scripts en " + rutaBase;
 		escribeResultados.escribe(texto+"\n", ficheroSalida, nivelTraza);
 		listaFicherosSCRIPT = Archivos.listarArchivosScript(ruta);	
 		
@@ -33,6 +33,43 @@ public class MainFunciones {
     		texto = "Apariciones de " + string_a_buscar + ": " + apariciones_total;
     		escribeResultados.escribe(texto+"\n", ficheroSalida, nivelTraza);	
     	}    	
+    }
+    
+    static void buscaVCOM_enScripts(String rutaBase, int nivelTraza, File ficheroSalida, File rutaScripts){
+    	List<File> listaFicherosSCRIPT = new ArrayList<File>();
+    	List<String> listaContextos = new ArrayList<String>();
+    	
+    	
+    	String texto = "buscaVCOM_enScripts: Buscando scripts en: " + rutaScripts;
+ 		escribeResultados.escribe(texto+"\n", ficheroSalida, nivelTraza);
+		listaFicherosSCRIPT = Archivos.listarArchivosScript(rutaScripts);	
+		if (listaFicherosSCRIPT==null) {
+	    	texto = "buscaVCOM_enScripts: NO se encuentra nada en: " + rutaScripts;
+	 		escribeResultados.escribe(texto+"\n", ficheroSalida, nivelTraza);
+		} else {
+			int apariciones = 0;
+			int apariciones_total =0;
+			String string_a_buscar = ("VCOM");
+			for (int in_Fichero_script=0;in_Fichero_script<listaFicherosSCRIPT.size();in_Fichero_script++){ 
+				File ficheroScript = listaFicherosSCRIPT.get(in_Fichero_script);
+		    	//apariciones = utilScript.buscaStringScript(string_a_buscar, ficheroScript);
+		    	apariciones = utilScript.busca1vezStringScript(string_a_buscar, ficheroScript);
+	    		if (apariciones > 0) {
+	    			
+	    			String aux=""+listaFicherosSCRIPT.get(in_Fichero_script);
+	    			String aux_rutaScriptsNombre = rutaScripts+"";
+	    			String aux1=aux.substring(aux_rutaScriptsNombre.length()+1);    			
+	    			int posBarraFinal= utilidades.buscaCaracterDesdeFin(aux1, '\\');
+	    			    			
+	    			String aux2=aux1.substring(0, posBarraFinal);
+	    			listaContextos.add(aux2);
+	    		}
+			}
+			
+			System.out.println(listaContextos);
+			texto = ""+listaContextos;		
+			escribeResultados.escribe(texto+"\n", ficheroSalida, nivelTraza);
+		}
     }
     
     static void borra_noUsados_enPruebas(String rutaBase, int nivelTraza, File ruta){

@@ -29,16 +29,19 @@ public class Archivos {
 	}	 
 	
 	public static ArrayList<File> listarArchivosScriptRec(File file) {	
-		File[] ficheros = file.listFiles();		
-		for (int i = 0; i < ficheros.length; i++) {
-			if (ficheros[i].isDirectory()) {
-				listarArchivosScriptRec(ficheros[i]);
-			} else if (getExtension(ficheros[i].getName()).equals("script"))
-			{
-				listaFicherosScriptRec.add(ficheros[i]);				
-			}
-		}		
-		return  (ArrayList<File>) listaFicherosScriptRec;
+		File[] ficheros = file.listFiles();	
+		if (ficheros!=null) {
+			for (int i = 0; i < ficheros.length; i++) {
+				if (ficheros[i].isDirectory()) {
+					listarArchivosScriptRec(ficheros[i]);
+				} else if (getExtension(ficheros[i].getName()).equals("script"))
+				{
+					listaFicherosScriptRec.add(ficheros[i]);				
+				}
+			}		
+			return  (ArrayList<File>) listaFicherosScriptRec;
+		} 
+		return null;
 	}
 	
 	public static ArrayList<File> listarArchivosScript(File file) {	

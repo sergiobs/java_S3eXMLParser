@@ -87,10 +87,15 @@ public class utilidades {
     		}
 
     	}  	
-    	int ggg=0;
-    	ggg++;;
-    	
     	return listaObjeto_Argumentos;
     }
 
+ static Integer buscaCaracterDesdeFin(String cadena, char caracter){   
+    	for (int i=0; i<(cadena.length());i++) {    		
+    		if (cadena.charAt(cadena.length()-1-i)==caracter) {
+    			return cadena.length()-i-1;    			
+    		}
+    	}  	    	
+    	return -1;    	
+    }    
 }

@@ -52,4 +52,24 @@ public class utilScript {
 		}
 		return apariciones;
 	}
+	
+	static Integer busca1vezStringScript (String stringBuscar, File fileScript) {
+		int apariciones = 0;
+		try {			
+			Scanner sc = new Scanner(fileScript);
+			String linea = "";
+			while (sc.hasNext()) {
+				linea = sc.nextLine();
+				if (linea.contains(stringBuscar)) {
+					apariciones++;	
+					break;
+				}
+			}			
+			sc.close();							
+		} catch (IOException e) {
+			e.printStackTrace();
+			//return  imprimeError+" " + e;
+		}
+		return apariciones;
+	}
 }

@@ -32,6 +32,7 @@ import java.sql.Timestamp;
 //				026.01 * Se renombra el fichero xml original con sufijo "_bck" y se guarda el fichero reducido 
 //						 con el nombre original
 //027 		* Se mejora la busqueda de elementos no usados teniendo en cuenta ""
+//028 		* Se busca en scriptsPrueba lo indicado en el segundo argumento (para modos degradados)
 
 public class main {
 	
@@ -47,6 +48,8 @@ public class main {
 		boolean estimaMCS = false;
 		boolean borraObjetos_noUsadosEnXML = false;
 		
+		String acciones ="";
+		
 		int nivelTraza = 2;
 		
 		// indicamos la ruta donde vamos a buscar los xml o bien la recogemos de argumento 1
@@ -56,8 +59,15 @@ public class main {
 		if (argv.length> 0) {
 			rutaBase = argv[0];
 		}
-		File ruta = new File(rutaBase);		
-			
+		File ruta = new File(rutaBase);
+		File rutaScripts = new File(rutaBase+"\\ScriptsPrueba");
+
+		if (argv.length> 1) {
+			acciones = argv[1];
+		}
+		
+		
+		
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 		String ficheroSalidaNombre="";
 		String ficheroSalidaNombre_numMCS="";
@@ -68,44 +78,37 @@ public class main {
 		
 		File ficheroSalida = new File(ruta.getAbsolutePath() + "\\analisisXML_"+ficheroSalidaNombre+".txt");		
 		File ficheroSalida_numMCS = new File(ruta.getAbsolutePath() + "\\analisisXML_"+	ficheroSalidaNombre_numMCS+".txt");
-//		if (ficheroSalida.exists()) {
-//			ficheroSalida.delete();
-//		}
-
-		// se pregunta por linea de comando las acciones______________________________________________
-		trataXML = MainFuncionesAcciones.pregunta_trataXML(ficheroSalida, nivelTraza, entradaEscaner);		
-		if (trataXML) {
-			//trataXML = MainFuncionesAcciones.pregunta_trataXML(ficheroSalida, nivelTraza);
-			calculaNombreObjetosRepetidosEnXML 
-				= MainFuncionesAcciones.pregunta_calculaNombreObjetosRepetidosEnXML(ficheroSalida, nivelTraza, entradaEscaner);
-			calculaIdentificadorObjetos_noUsadosEnXML 
-				= MainFuncionesAcciones.pregunta_calculaIdentificadorObjetos_noUsadosEnXML(ficheroSalida, nivelTraza, entradaEscaner);
-			borraObjetos_noUsadosEnXML 
-				= MainFuncionesAcciones.pregunta_borraObjetos_noUsadosEnXML(ficheroSalida, nivelTraza, entradaEscaner, calculaIdentificadorObjetos_noUsadosEnXML);
-			calculaNombreObjetosRepetidosEnXML_usados_en_Scripts 
-				= MainFuncionesAcciones.pregunta_calculaNombreObjetosRepetidosEnXML_usados_en_Scripts(ficheroSalida, nivelTraza, entradaEscaner, calculaNombreObjetosRepetidosEnXML);
-			estimaMCS  
-				= MainFuncionesAcciones.pregunta_EstimaMCS(ficheroSalida, nivelTraza, entradaEscaner);
 		
-			
-			
-			
+		// si no se dice nada por argumento, se pregunta por linea de comandos		
+		if (acciones =="") { 
+			// se pregunta por linea de comando las acciones______________________________________________
+			trataXML = MainFuncionesAcciones.pregunta_trataXML(ficheroSalida, nivelTraza, entradaEscaner);		
+			if (trataXML) {
+				//trataXML = MainFuncionesAcciones.pregunta_trataXML(ficheroSalida, nivelTraza);
+				calculaNombreObjetosRepetidosEnXML 
+					= MainFuncionesAcciones.pregunta_calculaNombreObjetosRepetidosEnXML(ficheroSalida, nivelTraza, entradaEscaner);
+				calculaIdentificadorObjetos_noUsadosEnXML 
+					= MainFuncionesAcciones.pregunta_calculaIdentificadorObjetos_noUsadosEnXML(ficheroSalida, nivelTraza, entradaEscaner);
+				borraObjetos_noUsadosEnXML 
+					= MainFuncionesAcciones.pregunta_borraObjetos_noUsadosEnXML(ficheroSalida, nivelTraza, entradaEscaner, calculaIdentificadorObjetos_noUsadosEnXML);
+				calculaNombreObjetosRepetidosEnXML_usados_en_Scripts 
+					= MainFuncionesAcciones.pregunta_calculaNombreObjetosRepetidosEnXML_usados_en_Scripts(ficheroSalida, nivelTraza, entradaEscaner, calculaNombreObjetosRepetidosEnXML);
+				estimaMCS  
+					= MainFuncionesAcciones.pregunta_EstimaMCS(ficheroSalida, nivelTraza, entradaEscaner);				
+			}
+			calcula_MCS_en_scripts = MainFuncionesAcciones.pregunta_calcula_MCS_en_scripts(ficheroSalida, nivelTraza, entradaEscaner);
+			// Fin de las preguntas por linea de comandos______________________________________________
 		}
-		calcula_MCS_en_scripts = MainFuncionesAcciones.pregunta_calcula_MCS_en_scripts(ficheroSalida, nivelTraza, entradaEscaner);
-		// Fin de las preguntas por linea de comandos______________________________________________
+		
+		
+		System.out.println("acciones: " + acciones);
+		// busca scripts con VCOM
+		if (acciones.equals("VCOM")) { 
+			MainFunciones.buscaVCOM_enScripts(rutaBase, nivelTraza, ficheroSalida, rutaScripts);
+		}
 		
 		
         Timestamp timestamp_inicial = new Timestamp(System.currentTimeMillis());
-		
-        // En funcion de las preguntas, se lanzan las acciones _______________________________________        
-		// para cada script
-        
-//		if (true) {
-//			MainFunciones.borra_noUsados_enPruebas(rutaBase, nivelTraza, ruta);
-//			trataXML = false;
-//		}       
-        
-        
         
 		if (calcula_MCS_en_scripts) {
 			MainFunciones.cuentaMCS_enScripts(rutaBase, nivelTraza, ficheroSalida, ruta);
@@ -120,7 +123,6 @@ public class main {
 			//hacemos nuestras cosas
 			MainFunciones.tratar_cada_XML(nivelTraza, ficheroSalida, ficheroSalida_numMCS, ruta, listaFicherosXML_validos, calculaNombreObjetosRepetidosEnXML, calculaIdentificadorObjetos_noUsadosEnXML, borraObjetos_noUsadosEnXML, calculaNombreObjetosRepetidosEnXML_usados_en_Scripts, estimaMCS);
 		}
-		
 		texto = "****************************************************\nFin del analisis\n\n\n";		
 		escribeResultados.escribe(texto+"\n", ficheroSalida, nivelTraza);		
 		Timestamp timestamp_fin = new Timestamp(System.currentTimeMillis());
@@ -128,9 +130,5 @@ public class main {
 		texto = "\nduracion total: " + milisenconds+" mseg\n\n\n";		
 		escribeResultados.escribe(texto+"\n", ficheroSalida, nivelTraza);		
 		entradaEscaner.close();
-		
-
-	}
-	
-
+	}	
 }
